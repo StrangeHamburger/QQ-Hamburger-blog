@@ -30,6 +30,31 @@ function scrollToBurger() {
 
     <!-- ======== Hero ======== -->
     <section class="hero">
+      <!-- 深海气泡（背景装饰） -->
+      <div class="hero-bubbles" aria-hidden="true">
+        <span class="bubble b1"></span>
+        <span class="bubble b2"></span>
+        <span class="bubble b3"></span>
+        <span class="bubble b4"></span>
+      </div>
+
+      <!-- 海绵宝宝元素：水母 + 海草 -->
+      <div class="hero-jelly" aria-hidden="true">
+        <svg viewBox="0 0 60 80">
+          <path d="M10 30 C 10 12, 50 12, 50 30 C 50 40, 40 46, 30 46 C 20 46, 10 40, 10 30 Z" fill="rgba(240, 150, 195, 0.4)" stroke="rgba(240, 120, 180, 0.5)" stroke-width="1.5"/>
+          <path d="M18 46 C 16 60, 14 68, 16 74 M25 46 C 24 62, 26 70, 24 76 M35 46 C 36 60, 34 68, 36 74 M42 46 C 44 62, 42 70, 44 76" stroke="rgba(240, 120, 180, 0.45)" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="22" cy="26" r="2" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="38" cy="26" r="2" fill="rgba(255,255,255,0.7)"/>
+        </svg>
+      </div>
+      <div class="hero-seaweed" aria-hidden="true">
+        <svg viewBox="0 0 120 60">
+          <path d="M20 60 C 15 45, 28 40, 20 25 C 14 14, 22 6, 18 0" stroke="rgba(90, 160, 80, 0.35)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M60 60 C 55 42, 68 38, 60 20 C 54 10, 62 4, 58 0" stroke="rgba(90, 160, 80, 0.28)" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M100 60 C 95 48, 105 40, 98 26 C 92 16, 100 8, 96 0" stroke="rgba(90, 160, 80, 0.22)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+
       <div class="container hero-inner">
         <div class="hero-name-block" @click="onNameClick">
           <h1 class="hero-name" :class="{ stamped: nameClicked }">{{ profile.name }}</h1>
@@ -50,6 +75,13 @@ function scrollToBurger() {
           <button class="btn btn-primary" @click="scrollToBurger">查看汉堡秘方 ↓</button>
           <a class="btn btn-ghost" href="#works">看看项目</a>
         </div>
+      </div>
+
+      <!-- 底部波浪分隔线 -->
+      <div class="hero-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 40" preserveAspectRatio="none">
+          <path d="M0 22 C 120 8, 240 8, 360 20 S 600 34, 720 22 S 960 6, 1080 18 S 1320 34, 1440 22 L 1440 40 L 0 40 Z" fill="currentColor"/>
+        </svg>
       </div>
     </section>
 
@@ -82,6 +114,75 @@ function scrollToBurger() {
 /* ---------- Hero ---------- */
 .hero { position: relative; overflow: hidden; padding: var(--space-7) 0 var(--space-6); }
 .hero-inner { position: relative; }
+
+/* 深海气泡 */
+.hero-bubbles {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(36, 66, 94, 0.18);
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.25), rgba(36,66,94,0.05) 70%);
+  animation: bubble-rise linear infinite;
+}
+.b1 { width: 14px; height: 14px; left: 12%; bottom: -20px; animation-duration: 11s; }
+.b2 { width: 8px; height: 8px; left: 28%; bottom: -20px; animation-duration: 15s; animation-delay: 2s; }
+.b3 { width: 20px; height: 20px; left: 74%; bottom: -20px; animation-duration: 13s; animation-delay: 5s; }
+.b4 { width: 10px; height: 10px; left: 88%; bottom: -20px; animation-duration: 17s; animation-delay: 7s; }
+@keyframes bubble-rise {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  8% { opacity: 0.7; }
+  50% { transform: translateY(-45vh) translateX(12px); opacity: 0.5; }
+  92% { opacity: 0.7; }
+  100% { transform: translateY(-85vh) translateX(-8px); opacity: 0; }
+}
+
+/* 水母（右上角漂浮） */
+.hero-jelly {
+  position: absolute;
+  right: 8%; top: 24%;
+  width: 52px;
+  z-index: 0;
+  opacity: 0.75;
+  pointer-events: none;
+  animation: jelly-float 6s ease-in-out infinite;
+}
+.hero-jelly svg { width: 100%; display: block; }
+@keyframes jelly-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-14px) rotate(3deg); }
+}
+
+/* 海草（左下角摇摆） */
+.hero-seaweed {
+  position: absolute;
+  left: 3%; bottom: -2px;
+  width: 130px;
+  z-index: 0;
+  pointer-events: none;
+  animation: seaweed-sway 4.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+.hero-seaweed svg { width: 100%; display: block; }
+@keyframes seaweed-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* 波浪分隔线（Hero 底部） */
+.hero-wave {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 34px;
+  color: var(--navy);
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 1;
+}
+.hero-wave svg { width: 100%; height: 100%; display: block; }
 
 .hero-name-block {
   display: inline-block; position: relative; cursor: pointer;

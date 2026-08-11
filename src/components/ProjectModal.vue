@@ -43,27 +43,25 @@ onUnmounted(() => {
           <!-- 引言 -->
           <p v-if="body?.intro" class="pm-intro">{{ body.intro }}</p>
 
-          <!-- 背景段落 -->
-          <template v-if="body?.background?.length">
-            <h3 class="pm-section mono-label">项目背景</h3>
-            <p v-for="(para, i) in body.background" :key="i" class="pm-para">{{ para }}</p>
-          </template>
+          <!-- 通用 sections（paras / list / chips） -->
+          <template v-for="(sec, si) in (body?.sections || [])" :key="si">
+            <h3 class="pm-section mono-label">{{ sec.title }}</h3>
 
-          <!-- 功能列表 -->
-          <template v-if="body?.features?.length">
-            <h3 class="pm-section mono-label">功能亮点</h3>
-            <ul class="pm-features">
-              <li v-for="f in body.features" :key="f" class="pm-feature">
+            <!-- 段落 -->
+            <template v-if="sec.type === 'paras'">
+              <p v-for="(para, pi) in sec.content" :key="pi" class="pm-para">{{ para }}</p>
+            </template>
+
+            <!-- 列表 -->
+            <ul v-else-if="sec.type === 'list'" class="pm-features">
+              <li v-for="(f, fi) in sec.content" :key="fi" class="pm-feature">
                 <span class="pm-check" aria-hidden="true">✓</span>{{ f }}
               </li>
             </ul>
-          </template>
 
-          <!-- 技术栈 -->
-          <template v-if="body?.tech?.length">
-            <h3 class="pm-section mono-label">技术栈</h3>
-            <div class="pm-tech">
-              <span v-for="t in body.tech" :key="t" class="pm-tech-chip">{{ t }}</span>
+            <!-- 胶囊 -->
+            <div v-else-if="sec.type === 'chips'" class="pm-tech">
+              <span v-for="(t, ti) in sec.content" :key="ti" class="pm-tech-chip">{{ t }}</span>
             </div>
           </template>
         </div>

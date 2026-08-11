@@ -1,7 +1,17 @@
 <script setup>
-import { github } from '../../data/content.js'
+import { ref, onMounted } from 'vue'
+import { github as staticGithub } from '../../data/content.js'
+import ProjectModal from '../ProjectModal.vue'
 
-// GitHub 语言颜色（GitHub 官方风格）
+// ============================================================
+// GitHub 栏目 · 运行时自动同步
+// 打开栏目时调用 GitHub API 拉取最新数据（仓库/stars/关注数）
+// API 失败/超时 → 降级显示 content.js 里的静态数据（不会白屏）
+// ============================================================
+
+const data = ref(staticGithub)
+const syncing = ref(false)
+
 const LANG_COLORS = {
   Go: '#00ADD8',
   TypeScript: '#3178c6',
@@ -16,52 +26,154 @@ const LANG_COLORS = {
 function langColor(lang) {
   return LANG_COLORS[lang] || '#8b949e'
 }
+
+function daysAgo(iso) {
+  const then = new Date(iso)
+  const now = new Date()
+  return Math.max(0, Math.floor((now - then) / 86400000))
+}
+
+async function sync() {
+  const name = data.value.username
+  if (!name || syncing.value) return
+  syncing.value = true
+  try {
+    // 8 秒超时，防止国内网络卡死
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 8000)
+
+    const [uRes, rRes] = await Promise.all([
+      fetch(`https://api.github.com/users/${name}`, { signal: controller.signal }),
+      fetch(`https://api.github.com/users/${name}/repos?sort=updated&per_page=10`, { signal: controller.signal })
+    ])
+    clearTimeout(timer)
+
+    if (!uRes.ok || !rRes.ok) return  // 失败保留静态数据
+
+    const u = await uRes.json()
+    const repos = await rRes.json()
+
+    data.value = {
+      username: u.login || name,
+      avatar: u.avatar_url || data.value.avatar,
+      bio: u.bio || '',
+      location: u.location || '',
+      followers: u.followers ?? 0,
+      following: u.following ?? 0,
+      publicRepos: u.public_repos ?? 0,
+      url: `https://github.com/${u.login || name}`,
+      repos: repos.map(r => ({
+        name: r.name,
+        desc: r.description || '',
+        lang: r.language || '',
+        stars: r.stargazers_count ?? 0,
+        updatedDays: daysAgo(r.updated_at),
+        href: r.html_url
+      }))
+    }
+  } catch {
+    // 网络失败 → 保持静态数据（content.js）
+  } finally {
+    syncing.value = false
+  }
+}
+
+onMounted(sync)
+
+// 仓库详情弹层
+const active = ref(null)
+function openRepo(r) {
+  active.value = {
+    name: r.name,
+    desc: r.desc,
+    meta: (r.lang || '—') + ' · ' + r.stars + ' ★',
+    detail: {
+      intro: r.desc,
+      sections: [
+        {
+          type: 'paras',
+          title: '关于这个仓库',
+          content: ['这个仓库托管在 GitHub 上，点下方链接可查看完整源码。']
+        },
+        {
+          type: 'chips',
+          title: '主要语言',
+          content: r.lang ? [r.lang] : []
+        }
+      ]
+    }
+  }
+}
+function closeRepo() { active.value = null }
 </script>
 
 <template>
   <div class="channel gh-panel">
+    <!-- 同步状态 -->
+    <span v-if="syncing" class="gh-syncing mono-label">⟳ 正在同步 GitHub 数据…</span>
+
     <!-- ======== 用户卡（meowj 式） ======== -->
     <div class="gh-user">
-      <img :src="github.avatar" :alt="github.username" class="gh-avatar" />
+      <img :src="data.avatar" :alt="data.username" class="gh-avatar" />
       <div class="gh-user-info">
-        <span class="gh-username">{{ github.username }}</span>
-        <span v-if="github.bio" class="gh-bio">{{ github.bio }}</span>
-        <span v-if="github.location" class="gh-loc mono-label">📍 {{ github.location }}</span>
+        <span class="gh-username">{{ data.username }}</span>
+        <span v-if="data.bio" class="gh-bio">{{ data.bio }}</span>
+        <span v-if="data.location" class="gh-loc mono-label">📍 {{ data.location }}</span>
         <span class="gh-stats mono-label">
-          {{ github.followers }} 关注者 · {{ github.following }} 关注中 · {{ github.publicRepos }} 仓库
+          {{ data.followers }} 关注者 · {{ data.following }} 关注中 · {{ data.publicRepos }} 仓库
         </span>
       </div>
-      <a class="gh-go" :href="github.url" target="_blank" rel="noopener">
+      <a class="gh-go" :href="data.url" target="_blank" rel="noopener">
         跳转 GitHub 主页 <span aria-hidden="true">↗</span>
       </a>
     </div>
 
-    <!-- ======== 仓库列表（meowj 式行） ======== -->
+    <!-- ======== 仓库列表（自动同步） ======== -->
     <div class="gh-repos">
-      <a
-        v-for="r in github.repos"
+      <div
+        v-for="r in data.repos"
         :key="r.name"
         class="gh-repo"
-        :href="r.href"
-        target="_blank"
-        rel="noopener"
+        role="button"
+        :tabindex="0"
+        @click="openRepo(r)"
+        @keydown.enter="openRepo(r)"
       >
         <div class="gh-top">
           <span class="gh-name">{{ r.name }}</span>
           <span class="gh-side mono-label">
             <span class="gh-dot" :style="{ background: langColor(r.lang) }"></span>
-            {{ r.lang }} · ★ {{ r.stars }} · {{ r.updatedDays }} 天前更新
+            {{ r.lang || '—' }} · ★ {{ r.stars }} · {{ r.updatedDays }} 天前更新
           </span>
         </div>
-        <span class="gh-desc">{{ r.desc }}</span>
-        <span class="gh-open mono-label">查看仓库 <span aria-hidden="true">↗</span></span>
-      </a>
+        <span class="gh-desc">{{ r.desc || '暂无描述' }}</span>
+        <span class="gh-open mono-label">查看详情 <span aria-hidden="true">↗</span></span>
+      </div>
+      <p v-if="!data.repos.length" class="gh-empty mono-label">暂无公开仓库</p>
     </div>
+
+    <!-- 仓库详情弹层 -->
+    <ProjectModal
+      v-if="active"
+      :title="active.name"
+      :subtitle="active.desc"
+      :meta="active.meta"
+      :body="active.detail"
+      @close="closeRepo"
+    />
   </div>
 </template>
 
 <style scoped>
 .gh-panel { display: flex; flex-direction: column; gap: 14px; }
+
+.gh-syncing {
+  align-self: center;
+  font-size: 9px;
+  color: var(--navy);
+  animation: sync-pulse 1.2s ease-in-out infinite;
+}
+@keyframes sync-pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
 /* ======== 用户卡 ======== */
 .gh-user {
@@ -145,4 +257,6 @@ function langColor(lang) {
   transition: color var(--dur-fast);
 }
 .gh-repo:hover .gh-open { color: var(--tomato); }
+
+.gh-empty { color: var(--ink-50); font-size: 10px; text-align: center; padding: 16px 0; }
 </style>
