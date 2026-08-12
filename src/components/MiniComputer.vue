@@ -2,79 +2,229 @@
 import { ref } from 'vue'
 import { photos } from '../data/content.js'
 
-// 红色按钮：开关屏幕；蓝色按钮：换图片（不影响开关）
+// ============================================================
+// 复古收银机 + 凤凰丁神奶彩蛋 v2
+// 触发：红+蓝按钮各点一次 → 3 秒后气泡提示（尖尖指收银台）
+// → 连点屏幕 3 次 → 屏幕碎裂（保持坏到对话结束）
+// → 凤凰从右登场（尖尖指凤凰）→ 点击凤凰推进对话
+// → 最后一击 → 凤凰返回 → 屏幕恢复
+// ============================================================
+
 const screenOn = ref(false)
 const photoIndex = ref(0)
 
+// ============ 凤凰彩蛋（集中配置） ============
+const EGG_HINT = '你可以试试连续点击三次屏幕'
+const EGG_WORDS = [
+  { img: 2, text: '你好，我是凤凰丁神奶，是你召唤了我，我将要你帮我实现三个愿望' },
+  { img: 3, text: '首先，请v我50块让我星期四能给你进行恳德基的祝福仪式' },
+  { img: 3, text: '然后，我需要你在一分钟之内做六百个后空翻，锻炼你的身体' },
+  { img: 3, text: '最后，我需要你去下面汉堡包那里留言，让你赛博永生' },
+  { img: 4, text: '拴Q，boy里嘛糍！！！' }
+]
+
+// 状态机：idle → hint → breaking → enter → talk → bye → idle
+const eggState = ref('idle')
+const clickedBtns = new Set()
+const screenClicks = ref(0)
+const talkIndex = ref(-1)
+const fxImg = ref(1)
+const fxVisible = ref(false)
+const bubbleVisible = ref(false)
+const bubbleText = ref('')
+let hintTimer = null
+
+// 屏幕是否处于"坏"状态（碎裂后一直保持）
+const screenBroken = computed(() =>
+  ['breaking', 'enter', 'talk', 'bye'].includes(eggState.value)
+)
+
+// ============ 基础功能 ============
 function toggleScreen() { screenOn.value = !screenOn.value }
-function nextPhoto() {
-  if (photos.length < 2) return
-  photoIndex.value = (photoIndex.value + 1) % photos.length
+function nextPhoto() { photoIndex.value = (photoIndex.value + 1) % photos.length }
+
+function onRed() { toggleScreen(); noteButton('red') }
+function onBlue() { nextPhoto(); noteButton('blue') }
+
+function noteButton(which) {
+  if (eggState.value !== 'idle') return
+  clickedBtns.add(which)
+  if (clickedBtns.size >= 2) {
+    hintTimer = setTimeout(() => {
+      if (eggState.value !== 'idle') return
+      eggState.value = 'hint'
+      bubbleText.value = EGG_HINT
+      bubbleVisible.value = true
+    }, 1000)   // 间隔 1 秒
+  }
+}
+
+// 屏幕点击：仅 hint 阶段连点 3 次
+function onScreenClick() {
+  if (eggState.value !== 'hint') return
+  screenClicks.value++
+  if (screenClicks.value >= 3) startBreaking()
+}
+
+// 凤凰点击：talk 阶段推进对话
+function onPhenixClick() {
+  if (eggState.value === 'talk') advanceTalk()
+}
+
+// 屏幕碎裂 → 凤凰登场
+function startBreaking() {
+  bubbleVisible.value = false
+  eggState.value = 'breaking'
+  setTimeout(() => {
+    eggState.value = 'enter'
+    fxImg.value = 1
+    fxVisible.value = true
+    setTimeout(() => {
+      showBubble(0)
+      eggState.value = 'talk'
+    }, 950)
+  }, 950)
+}
+
+function showBubble(i) {
+  talkIndex.value = i
+  bubbleText.value = EGG_WORDS[i].text
+  fxImg.value = EGG_WORDS[i].img
+  bubbleVisible.value = true
+  // 最后一句：1.5 秒后气泡消失 → 凤凰退场（自动）
+  if (i === EGG_WORDS.length - 1) {
+    setTimeout(finishEgg, 1500)
+  }
+}
+
+// 对话推进：点击凤凰换下一句；最后一句由自动退场接管
+function advanceTalk() {
+  if (talkIndex.value < EGG_WORDS.length - 1) {
+    showBubble(talkIndex.value + 1)
+  }
+}
+
+// 退场：气泡消失 → 凤凰滑出 → 恢复
+function finishEgg() {
+  bubbleVisible.value = false
+  eggState.value = 'bye'
+  setTimeout(() => {
+    fxVisible.value = false   // 触发滑出动画
+    setTimeout(resetEgg, 800)
+  }, 300)
+}
+
+function resetEgg() {
+  eggState.value = 'idle'
+  clickedBtns.clear()
+  screenClicks.value = 0
+  talkIndex.value = -1
+  fxImg.value = 1
+  clearTimeout(hintTimer)
 }
 </script>
 
 <template>
   <div class="mini-computer" :class="{ 'screen-on': screenOn }">
     <div class="box">
-      <!-- 屏幕（显示当前照片） -->
-      <div class="mc-screen">
+      <!-- 顶部招牌条 -->
+      <div class="mc-sign" aria-hidden="true">
+        <span class="mc-sign-text">MY HANDSOME PHOTOS</span>
+      </div>
+
+      <!-- 屏幕 -->
+      <div class="mc-screen" :class="{ breaking: eggState === 'breaking', broken: screenBroken }" @click="onScreenClick">
         <img :src="photos[photoIndex]" alt="屏幕照片" class="mc-photo" :class="{ 'zoom-first': photoIndex === 0 }" />
         <div class="mc-scan" aria-hidden="true"></div>
-        <!-- 故障效果层（仅关闭时显示） -->
+        <!-- 故障效果层 -->
         <div class="glitch-noise" aria-hidden="true"></div>
         <div class="glitch-noise-2" aria-hidden="true"></div>
-        <!-- 小块碎片（替代长条） -->
         <div class="glitch-chip chip-1" aria-hidden="true"></div>
         <div class="glitch-chip chip-2" aria-hidden="true"></div>
         <div class="glitch-chip chip-3" aria-hidden="true"></div>
         <div class="glitch-chip chip-4" aria-hidden="true"></div>
         <div class="glitch-chip chip-5" aria-hidden="true"></div>
         <div class="glitch-chip chip-6" aria-hidden="true"></div>
+        <!-- 碎裂裂纹层 -->
+        <svg class="fx-crack" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M50 0 L 52 30 L 30 45 L 55 60 L 45 100" stroke="rgba(255,255,255,0.95)" stroke-width="1.2" fill="none"/>
+          <path d="M52 30 L 85 24" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" fill="none"/>
+          <path d="M55 60 L 82 68" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" fill="none"/>
+          <path d="M30 45 L 8 52" stroke="rgba(255,255,255,0.7)" stroke-width="0.8" fill="none"/>
+          <path d="M45 100 L 48 78 L 70 72" stroke="rgba(255,255,255,0.6)" stroke-width="0.8" fill="none"/>
+        </svg>
         <span class="mc-boot off" v-if="!screenOn">SIGNAL LOST</span>
         <span class="mc-boot on" v-else>BOOT OK</span>
       </div>
 
-      <!-- 红蓝按钮 -->
-      <div class="mc-buttons">
-        <button
-          class="mc-btn btn-red"
-          :class="{ active: screenOn }"
-          @click="toggleScreen"
-          :aria-label="screenOn ? '关闭屏幕' : '打开屏幕'"
-        >
-          <span class="btn-dot" aria-hidden="true"></span>
-          <span class="btn-label mono-label">{{ screenOn ? 'POWER ON' : 'POWER' }}</span>
+      <!-- 红蓝按钮（带英文标识） -->
+      <div class="mc-btns">
+        <button class="btn-red" @click="onRed" aria-label="开关屏幕" :disabled="screenBroken">
+          <span class="btn-label mono-label">POWER</span>
         </button>
-        <button
-          class="mc-btn btn-blue"
-          @click="nextPhoto"
-          :disabled="photos.length < 2"
-          aria-label="切换图片"
-        >
-          <span class="btn-dot" aria-hidden="true"></span>
+        <button class="btn-blue" @click="onBlue" aria-label="切换照片" :disabled="screenBroken">
           <span class="btn-label mono-label">PHOTO</span>
         </button>
       </div>
     </div>
+
+    <!-- 凤凰（对话阶段点击推进） -->
+    <transition name="fx-slide">
+      <div v-if="fxVisible" class="fx-phenix" @click="onPhenixClick" role="button" aria-label="凤凰丁神奶">
+        <img :src="'/src/assets/fx-' + fxImg + '.png'" alt="" class="fx-img" />
+      </div>
+    </transition>
+
+    <!-- 气泡（hint 尖尖指收银台 / talk 尖尖指凤凰） -->
+    <transition name="bubble-pop">
+      <div
+        v-if="bubbleVisible"
+        :key="talkIndex"
+        class="fx-bubble"
+        :class="{ hint: eggState === 'hint' }"
+      >{{ bubbleText }}</div>
+    </transition>
   </div>
 </template>
+
+<script>
+import { computed } from 'vue'
+</script>
 
 <style scoped>
 .mini-computer {
   position: absolute;
-  right: 492px; top: 278px;  /* 右移1/3身位（right 减小 83px） */
+  right: 492px; top: 278px;
   z-index: 40;
-  width: clamp(190px, 22vw, 250px);  /* 再放大 */
+  width: clamp(190px, 22vw, 250px);
   transition: transform var(--dur) var(--ease-spring);
 }
-.mini-computer:hover { transform: translateY(-4px); }
 
 .box {
   background: var(--cream);
   border: 2px solid var(--ink);
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 5px 0 var(--ink-12), 0 14px 30px rgba(26,26,24,0.22);
+  border-radius: var(--radius-lg);
+  padding: 10px;
+  box-shadow: 0 5px 0 var(--ink-12), 0 14px 28px rgba(26, 26, 24, 0.12);
+}
+
+/* ======== 顶部招牌条 ======== */
+.mc-sign {
+  background: var(--tomato);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  padding: 4px 0;
+  text-align: center;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 0 var(--ink-12);
+}
+.mc-sign-text {
+  font-family: var(--font-mono);
+  font-size: 15px;   /* 大一倍（原 7.5px） */
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 /* ======== 屏幕 ======== */
@@ -84,8 +234,8 @@ function nextPhoto() {
   background: #101010;
   border-radius: 6px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
 }
 .mc-photo {
   width: 100%; height: 100%;
@@ -94,18 +244,14 @@ function nextPhoto() {
   filter: brightness(0.4);
   transition: opacity var(--dur) var(--ease-out), filter var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
 }
-/* 第一张图放大一点点（1%） */
 .mc-photo.zoom-first { transform: scale(1.01); }
 .screen-on .mc-photo { opacity: 1; filter: brightness(1); }
 
 .mc-scan {
   position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.035) 0 1px,
-    transparent 1px 3px
-  );
   pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
 }
 
 .mc-boot {
@@ -120,170 +266,206 @@ function nextPhoto() {
 .screen-on .mc-boot.off { display: none; }
 .screen-on .mc-boot.on { display: block; }
 
-/* ======== 故障效果（仅关闭时，无长条横线） ======== */
-.glitch-noise,
-.glitch-noise-2 {
-  position: absolute;
-  display: none;
+/* ======== 碎裂 ======== */
+.fx-crack {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+/* 碎裂瞬间 */
+.mc-screen.breaking { animation: screen-break 950ms ease; }
+.mc-screen.breaking .fx-crack { animation: crack-in 420ms steps(6) 80ms forwards; }
+/* 保持碎裂（对话期间屏幕一直坏） */
+.mc-screen.broken { animation: broken-flicker 0.42s steps(2) infinite; }
+.mc-screen.broken .fx-crack { opacity: 1; }
+/* 坏屏幕：故障层常显 */
+.mc-screen.broken .glitch-noise,
+.mc-screen.broken .glitch-noise-2,
+.mc-screen.broken .glitch-chip { display: block; }
+.mc-screen.broken .mc-photo { opacity: 0.15; filter: brightness(0.5); }
+
+@keyframes screen-break {
+  0%, 100% { transform: none; filter: none; }
+  10% { transform: translateX(-3px) skewX(2deg); filter: brightness(2.2); }
+  20% { transform: translateX(4px); filter: brightness(1.5); }
+  30% { transform: translateX(-2px) skewX(-3deg); }
+  40% { transform: translateY(2px) scale(1.02); }
+  50% { transform: translateX(3px); filter: brightness(3); }
+  60% { transform: translateX(-3px) skewX(2deg); }
+  70% { transform: translateY(-2px); }
+  80% { transform: translateX(2px); filter: brightness(1.8); }
+}
+@keyframes crack-in {
+  0% { opacity: 0; transform: scale(1.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes broken-flicker {
+  0%, 100% { transform: none; filter: brightness(1); }
+  50% { transform: translateX(1px); filter: brightness(1.6); }
 }
 
-/* 雪花噪点 1（粗，快跳） */
-.mini-computer:not(.screen-on) .glitch-noise {
+/* ======== 故障效果 ======== */
+.glitch-noise, .glitch-noise-2 { position: absolute; display: none; }
+.mini-computer:not(.screen-on) .glitch-noise,
+.mc-screen.broken .glitch-noise {
   display: block;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 90px 90px;
-  opacity: 0.45;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.5;
+  animation: noise-jump 0.28s steps(4) infinite;
   pointer-events: none;
-  animation: glitch-noise-jump 0.28s steps(4) infinite;
 }
-
-/* 雪花噪点 2（细密，反向慢跳） */
-.mini-computer:not(.screen-on) .glitch-noise-2 {
+.mini-computer:not(.screen-on) .glitch-noise-2,
+.mc-screen.broken .glitch-noise-2 {
   display: block;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='40' height='40' filter='url(%23n2)'/%3E%3C/svg%3E");
-  background-size: 40px 40px;
-  opacity: 0.3;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.35' numOctaves='3'/%3E%3C/filter%3E%3Crect width='90' height='90' filter='url(%23n2)' opacity='0.35'/%3E%3C/svg%3E");
+  animation: noise-jump 0.45s steps(5) infinite reverse;
   pointer-events: none;
-  animation: glitch-noise-jump2 0.45s steps(5) infinite reverse;
 }
-@keyframes glitch-noise-jump {
+@keyframes noise-jump {
   0% { transform: translate(0, 0); }
   25% { transform: translate(-7%, 5%); }
-  50% { transform: translate(5%, -6%); }
+  50% { transform: translate(5%, -4%); }
   75% { transform: translate(-4%, 7%); }
   100% { transform: translate(0, 0); }
 }
-@keyframes glitch-noise-jump2 {
-  0% { transform: translate(0, 0); }
-  30% { transform: translate(9%, -7%); }
-  60% { transform: translate(-6%, 8%); }
-  100% { transform: translate(4%, -3%); }
-}
 
-/* 小块碎片（短小色块乱窜闪现） */
-.glitch-chip {
-  position: absolute;
-  display: none;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-.mini-computer:not(.screen-on) .glitch-chip { display: block; }
-
-.chip-1 { width: 26px; height: 6px;  left: 10%; top: 24%; background: rgba(224, 69, 46, 0.38);   animation: chip-a 0.8s steps(2) infinite; }
-.chip-2 { width: 16px; height: 5px;  left: 66%; top: 34%; background: rgba(70, 130, 220, 0.35);  animation: chip-b 1s steps(2) infinite; }
-.chip-3 { width: 34px; height: 7px;  left: 28%; top: 56%; background: rgba(70, 200, 180, 0.32);  animation: chip-c 0.7s steps(2) infinite; }
-.chip-4 { width: 12px; height: 4px;  left: 78%; top: 72%; background: rgba(255, 255, 255, 0.22); animation: chip-a 1.2s steps(2) infinite reverse; }
-.chip-5 { width: 20px; height: 5px;  left: 44%; top: 42%; background: rgba(224, 69, 46, 0.32);   animation: chip-b 0.9s steps(2) infinite reverse; }
-.chip-6 { width: 28px; height: 6px;  left: 6%;  top: 82%; background: rgba(70, 130, 220, 0.3);   animation: chip-c 1.1s steps(2) infinite; }
-
+.glitch-chip { position: absolute; display: none; mix-blend-mode: screen; pointer-events: none; }
+.mini-computer:not(.screen-on) .glitch-chip,
+.mc-screen.broken .glitch-chip { display: block; }
+.chip-1 { width: 28px; height: 6px; left: 12%; top: 22%; background: rgba(224,69,46,0.35); animation: chip-a 0.8s steps(2) infinite; }
+.chip-2 { width: 18px; height: 5px; left: 68%; top: 35%; background: rgba(70,130,220,0.32); animation: chip-b 1s steps(2) infinite; }
+.chip-3 { width: 36px; height: 7px; left: 30%; top: 58%; background: rgba(70,200,180,0.3); animation: chip-c 0.7s steps(2) infinite; }
+.chip-4 { width: 14px; height: 4px; left: 80%; top: 70%; background: rgba(255,255,255,0.2); animation: chip-a 1.2s steps(2) infinite reverse; }
+.chip-5 { width: 22px; height: 5px; left: 45%; top: 40%; background: rgba(224,69,46,0.3); animation: chip-b 0.9s steps(2) infinite reverse; }
+.chip-6 { width: 30px; height: 6px; left: 8%; top: 80%; background: rgba(70,130,220,0.28); animation: chip-c 1.1s steps(2) infinite; }
 @keyframes chip-a {
   0%, 100% { transform: translateX(0); opacity: 0; }
-  28% { transform: translateX(10px); opacity: 1; }
-  55% { transform: translateX(-7px); opacity: 0.6; }
-  72% { transform: translateX(3px); opacity: 0; }
+  30% { transform: translateX(10px); opacity: 1; }
+  60% { transform: translateX(-8px); opacity: 0.6; }
+  70% { transform: translateX(4px); opacity: 0; }
 }
 @keyframes chip-b {
   0%, 100% { transform: translateY(0); opacity: 0; }
-  35% { transform: translateY(8px) translateX(-5px); opacity: 1; }
-  60% { transform: translateY(-5px); opacity: 0.5; }
-  78% { transform: translateY(2px); opacity: 0; }
+  40% { transform: translateY(8px) translateX(-6px); opacity: 1; }
+  65% { transform: translateY(-6px); opacity: 0.5; }
+  75% { transform: translateY(3px); opacity: 0; }
 }
 @keyframes chip-c {
   0%, 100% { transform: translateX(0) scale(1); opacity: 0; }
-  30% { transform: translateX(-9px) scale(1.1); opacity: 1; }
-  58% { transform: translateX(5px) scale(0.9); opacity: 0.4; }
-  75% { transform: translateX(-2px); opacity: 0; }
-}
-
-/* 照片 RGB 分离（关闭时照片也故障） */
-.mini-computer:not(.screen-on) .mc-photo {
-  filter: brightness(0.32)
-    drop-shadow(2.5px 0 0 rgba(255, 40, 40, 0.4))
-    drop-shadow(-2.5px 0 0 rgba(60, 140, 255, 0.4));
-  animation: img-glitch 1.1s steps(2) infinite;
-}
-@keyframes img-glitch {
-  0%, 100% { transform: translateX(0); }
-  47% { transform: translateX(-2px); }
-  49% { transform: translateX(2px); }
-  51% { transform: translateX(0); }
-}
-
-/* 屏幕整体闪烁 + 横抖 */
-.mini-computer:not(.screen-on) .mc-screen {
-  animation: screen-flicker 1.5s linear infinite, screen-shake 2.7s steps(2) infinite;
-}
-@keyframes screen-flicker {
-  0%, 100% { opacity: 1; }
-  88% { opacity: 1; }
-  89% { opacity: 0.5; }
-  90% { opacity: 1; }
-  94% { opacity: 0.75; }
-  95% { opacity: 1; }
-}
-@keyframes screen-shake {
-  0%, 100% { transform: translateX(0); }
-  44% { transform: translateX(0); }
-  45% { transform: translateX(-3px); }
-  46% { transform: translateX(3px); }
-  47% { transform: translateX(-2px); }
-  48% { transform: translateX(0); }
-}
-
-/* SIGNAL LOST 文字抖动 */
-.mini-computer:not(.screen-on) .mc-boot.off {
-  animation: boot-jitter 0.45s steps(2) infinite;
-  color: rgba(255, 120, 100, 0.65);
-  text-shadow: 1px 0 0 rgba(255, 40, 40, 0.6), -1px 0 0 rgba(60, 140, 255, 0.6);
-}
-@keyframes boot-jitter {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(1.5px); }
+  35% { transform: translateX(-10px) scale(1.1); opacity: 1; }
+  60% { transform: translateX(6px) scale(0.9); opacity: 0.4; }
+  70% { transform: translateX(-3px); opacity: 0; }
 }
 
 /* ======== 红蓝按钮 ======== */
-.mc-buttons {
-  display: flex; gap: 8px;
-  margin-top: 8px;
-}
-
-.mc-btn {
+.mc-btns { display: flex; gap: 10px; margin-top: 10px; }
+.btn-red, .btn-blue {
   flex: 1;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
+  height: 30px;
   border-radius: 999px;
-  padding: 7px 4px;
   border: 2px solid var(--ink);
-  transition: transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast), opacity var(--dur-fast);
   cursor: pointer;
-}
-.mc-btn:hover { transform: translateY(-2px); }
-.mc-btn:active { transform: translateY(0); }
-.mc-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-
-.btn-red {
-  background: var(--tomato);
-  box-shadow: 0 3px 0 var(--ink-12);
-}
-.btn-red.active {
-  background: var(--mustard);
-}
-
-.btn-blue {
-  background: var(--navy);
-  box-shadow: 0 3px 0 var(--ink-12);
-}
-
-.btn-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--cream);
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform var(--dur-fast) var(--ease-spring), filter var(--dur-fast);
 }
 .btn-label {
-  font-size: 7px;
+  font-size: 8px;
+  font-weight: 700;
   color: var(--cream);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.18em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+.btn-red {
+  background: linear-gradient(180deg, #f06a52, var(--tomato));
+  box-shadow: 0 3px 0 rgba(120, 30, 15, 0.45);
+}
+.btn-blue {
+  background: linear-gradient(180deg, #4a7ab0, var(--navy));
+  box-shadow: 0 3px 0 rgba(15, 30, 50, 0.45);
+}
+.btn-red:hover, .btn-blue:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.btn-red:active, .btn-blue:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,0.3); }
+.btn-red:disabled, .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ======== 凤凰（放大 + 可点击） ======== */
+.fx-phenix {
+  position: fixed;
+  right: 80px; top: 360px;
+  width: 170px;
+  z-index: 150;
+  cursor: pointer;
+}
+.fx-img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(26,26,24,0.28));
+}
+.fx-slide-enter-active { transition: transform 900ms var(--ease-spring); }
+.fx-slide-enter-from { transform: translateX(85vw); }
+.fx-slide-leave-active { transition: transform 2000ms var(--ease-spring); }
+.fx-slide-leave-to { transform: translateX(85vw); }
+
+/* ======== 气泡 v4（Q 版可爱风） ======== */
+.fx-bubble {
+  position: fixed;
+  right: 248px; top: 360px;   /* 右移半个身位 */
+  width: 180px;
+  background: #fffdf6;                 /* 奶油白 */
+  border: 3px solid var(--ink);
+  border-radius: 24px;                 /* 大圆角，Q 版 */
+  padding: 14px 18px;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink-12), 0 12px 24px rgba(26, 26, 24, 0.15);
+  z-index: 151;
+  cursor: pointer;
+}
+/* 右上角小圆点装饰（不挡字） */
+.fx-bubble::before {
+  content: '';
+  position: absolute;
+  top: -7px; right: 16px;
+  width: 13px; height: 13px;
+  background: var(--mustard);
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+/* 尖尖：talk 指向凤凰（右侧） */
+.fx-bubble::after {
+  content: '';
+  position: absolute;
+  left: 100%; top: 28px;
+  border: 9px solid transparent;
+  border-left-color: var(--ink);
+  border-radius: 2px;
+}
+/* hint 指向收银台（左侧） */
+.fx-bubble.hint { right: 158px; top: 320px; }
+.fx-bubble.hint::after {
+  left: auto; right: 100%;
+  border: 9px solid transparent;
+  border-right-color: var(--ink);
+}
+
+/* 语句切换：先缩小再弹大（1 秒，更明显） */
+.bubble-pop-enter-active { animation: bubble-pop 1000ms var(--ease-spring); }
+.bubble-pop-leave-active { transition: opacity 180ms ease; }
+.bubble-pop-leave-to { opacity: 0; }
+@keyframes bubble-pop {
+  0% { opacity: 0; transform: scale(0.55); }
+  65% { opacity: 1; transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 767px) {
+  .fx-phenix { right: 16px; top: auto; bottom: 100px; width: 120px; }
+  .fx-bubble { right: 24px; top: auto; bottom: 230px; width: 130px; font-size: 12px; }
+  .fx-bubble.hint { right: 24px; top: auto; bottom: 230px; }
 }
 </style>

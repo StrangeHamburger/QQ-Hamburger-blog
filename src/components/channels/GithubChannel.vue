@@ -87,13 +87,14 @@ function openRepo(r) {
     name: r.name,
     desc: r.desc,
     meta: (r.lang || '—') + ' · ' + r.stars + ' ★',
+    href: r.href,
     detail: {
       intro: r.desc,
       sections: [
         {
           type: 'paras',
           title: '关于这个仓库',
-          content: ['这个仓库托管在 GitHub 上，点下方链接可查看完整源码。']
+          content: ['这个仓库托管在 GitHub 上，点下方按钮查看完整源码。']
         },
         {
           type: 'chips',
@@ -159,6 +160,8 @@ function closeRepo() { active.value = null }
       :subtitle="active.desc"
       :meta="active.meta"
       :body="active.detail"
+      :href="active.href"
+      href-label="查看仓库"
       @close="closeRepo"
     />
   </div>

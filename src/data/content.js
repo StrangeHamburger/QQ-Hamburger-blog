@@ -94,7 +94,8 @@ export const projects = [
     desc: '个人博客，记录汉堡与代码的日常',
     year: '2026',
     tag: 'BLOG',
-    image: null,
+    image: '/src/assets/project-1.jpg',  // 项目封面图
+    href: 'https://github.com/StrangeHamburger/QQ-Hamburger-blog',  // 项目链接（GitHub/线上地址）
     detail: {
       intro: '一个记录代码与生活的小站——把汉堡秘方和 bug 修复记在同一个屋檐下。',
       sections: [

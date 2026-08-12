@@ -5,7 +5,9 @@ defineProps({
   title: String,
   subtitle: String,
   meta: String,
-  body: Object
+  body: Object,
+  href: String,   // 项目/GitHub 链接（可选）
+  hrefLabel: String  // 按钮文字（默认"查看项目"）
 })
 const emit = defineEmits(['close'])
 
@@ -64,6 +66,18 @@ onUnmounted(() => {
               <span v-for="(t, ti) in sec.content" :key="ti" class="pm-tech-chip">{{ t }}</span>
             </div>
           </template>
+
+          <!-- 跳转按钮 -->
+          <div v-if="href" class="pm-footer">
+            <a
+              class="pm-link"
+              :href="href"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ hrefLabel || '查看项目' }} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -195,6 +209,26 @@ onUnmounted(() => {
   transition: background var(--dur-fast), border-color var(--dur-fast);
 }
 .pm-tech-chip:hover { background: var(--mustard-soft); border-color: var(--mustard); }
+
+/* 底部跳转按钮 */
+.pm-footer {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ink-08);
+  display: flex; justify-content: flex-end;
+}
+.pm-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cream);
+  background: var(--navy);
+  border-radius: 999px;
+  padding: 10px 22px;
+  box-shadow: 0 3px 0 var(--ink-12);
+  transition: transform var(--dur-fast) var(--ease-spring), background var(--dur-fast);
+}
+.pm-link:hover { transform: translateY(-2px); background: var(--tomato); }
 
 @media (max-width: 767px) {
   .pm-head { padding: 20px 20px 16px; }

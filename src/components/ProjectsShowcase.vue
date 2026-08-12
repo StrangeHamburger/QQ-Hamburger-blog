@@ -52,6 +52,7 @@ function closeProject() { active.value = null }
       :subtitle="active.desc"
       :meta="active.tag + ' · ' + active.year"
       :body="active.detail"
+      :href="active.href"
       @close="closeProject"
     />
   </section>
