@@ -6,7 +6,12 @@ const emit = defineEmits(['hover-layer', 'select-layer'])
 const open = ref(false)
 const hoverIndex = ref(-1)
 
-function toggle() { open.value = !open.value }
+function toggle() {
+  open.value = !open.value
+  // 音效由全局委托处理（展开 paper / 收起 click）
+  // 防止按钮聚焦触发浏览器 scroll-into-view 导致页面跳动
+  if (document.activeElement) document.activeElement.blur()
+}
 function onEnter(i) { hoverIndex.value = i; emit('hover-layer', i) }
 function onLeave() { hoverIndex.value = -1; emit('hover-layer', -1) }
 function onSelect(i) { emit('select-layer', i) }
@@ -14,6 +19,11 @@ function onSelect(i) { emit('select-layer', i) }
 
 <template>
   <div class="formula" :class="{ open }">
+    <!-- 卷轴上方的图（未打开时显示，打开后收起；用外框高度过渡，避免 v-if 瞬间高度跳变导致页面抖动） -->
+    <div class="scroll-top" :class="{ hide: open }">
+      <img src="/src/assets/scroll-top.png" alt="" class="scroll-top-img" aria-hidden="true" />
+    </div>
+
     <!-- 卷轴（点击展开/收起） -->
     <button class="formula-scroll" @click="toggle" :aria-expanded="open" aria-label="秘方卷轴">
       <div class="scroll-rod scroll-rod--top"></div>
@@ -30,7 +40,12 @@ function onSelect(i) { emit('select-layer', i) }
       </svg>
     </button>
 
-    <!-- 展开面板：从纸卷里浮现（max-height + opacity 平滑过渡） -->
+    <!-- 打开后：从卷轴后方往左冒出的图 -->
+    <transition name="pop-left">
+      <img v-if="open" src="/src/assets/scroll-out.png" alt="" class="scroll-out-img" aria-hidden="true" />
+    </transition>
+
+    <!-- 展开面板：从纸卷里浮现（grid-rows + opacity 平滑过渡） -->
     <div class="formula-panel" :class="{ expanded: open }">
       <div class="panel-inner">
         <div class="formula-head">
@@ -68,6 +83,11 @@ function onSelect(i) { emit('select-layer', i) }
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   width: clamp(200px, 22vw, 260px);
+  animation: formula-bob 3.2s ease-in-out infinite;   /* 图片+卷轴一起浮动 */
+}
+@keyframes formula-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 /* ======== 卷轴 ======== */
@@ -75,8 +95,57 @@ function onSelect(i) { emit('select-layer', i) }
   display: flex; flex-direction: column; align-items: center;
   width: 100%; padding: 0; cursor: pointer;
   transition: transform var(--dur) var(--ease-spring);
+  position: relative;
+  z-index: 2;
 }
 .formula-scroll:hover { transform: scale(1.03); }
+
+/* 卷轴上方的图（未打开时显示；外框高度过渡，收起时裁剪图片不被压扁） */
+.scroll-top {
+  position: relative;
+  height: clamp(200px, 22vw, 264px);   /* 正方形图的高度，与宽度一致 */
+  margin-bottom: -82px;                /* 卷轴上移，对齐图上的黑色横线（再上一点点） */
+  overflow: hidden;                    /* 收起时裁剪，避免图片被纵向压扁 */
+  z-index: 3;
+  pointer-events: none;                /* 不拦截鼠标，hover 穿透到卷轴 */
+  filter: drop-shadow(0 6px 12px rgba(26, 26, 24, 0.18));
+  transition: height 450ms var(--ease-out), margin-bottom 450ms var(--ease-out), opacity 300ms ease;
+}
+.scroll-top.hide {
+  height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+}
+.scroll-top-img {
+  display: block;
+  width: clamp(200px, 22vw, 264px);    /* 再大一倍 */
+  height: clamp(200px, 22vw, 264px);   /* 固定高，随外框裁剪，不参与缩放 */
+}
+
+/* 打开后从卷轴后方往左冒出的图 */
+.scroll-out-img {
+  position: absolute;
+  left: -190px;
+  top: 38%;
+  width: clamp(224px, 26vw, 300px);   /* 再大一倍 */
+  z-index: 1;          /* 在卷轴(z2)后面冒出来 */
+  filter: drop-shadow(0 8px 16px rgba(26, 26, 24, 0.2));
+  pointer-events: none;
+}
+.pop-left-enter-active {
+  transition: opacity 500ms ease, transform 650ms var(--ease-spring);
+}
+.pop-left-enter-from {
+  opacity: 0;
+  transform: translateX(42px) scale(0.9);   /* 从卷轴后方位置冒出 */
+}
+.pop-left-leave-active {
+  transition: opacity 300ms ease, transform 350ms ease;
+}
+.pop-left-leave-to {
+  opacity: 0;
+  transform: translateX(-24px) scale(0.92);
+}
 
 .scroll-rod {
   width: 100%; height: 10px;
@@ -142,19 +211,21 @@ function onSelect(i) { emit('select-layer', i) }
 /* ======== 展开面板：纸卷里浮现 ======== */
 .formula-panel {
   width: 100%;
+  display: grid;
+  grid-template-rows: 0fr;             /* 用 0fr→1fr 取代 max-height，收起无"假死延迟"、更平滑 */
   overflow: hidden;
-  max-height: 0;
   opacity: 0;
   transform: translateY(-8px);
-  transition: max-height 520ms var(--ease-out), opacity 360ms ease 120ms, transform 520ms var(--ease-out);
+  transition: grid-template-rows 520ms var(--ease-out), opacity 360ms ease 120ms, transform 520ms var(--ease-out);
 }
 .formula-panel.expanded {
-  max-height: 460px;
+  grid-template-rows: 1fr;
   opacity: 1;
   transform: translateY(0);
 }
 
 .panel-inner {
+  min-height: 0;                       /* grid 项可收缩到 0，配合 0fr 完全收起 */
   background: var(--cream);
   border: 1.5px solid var(--ink-12);
   border-top: none;

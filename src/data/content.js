@@ -16,7 +16,9 @@ export const photos = [
   '/src/assets/photo-1.jpg',
   '/src/assets/photo-2.jpg',
   '/src/assets/photo-3.jpg',
-  '/src/assets/photo-4.jpg'
+  '/src/assets/photo-4.jpg',
+  '/src/assets/photo-5.jpg',
+  '/src/assets/photo-6.jpg'
 ]
 
 export const stats = [

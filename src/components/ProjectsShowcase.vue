@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { projects } from '../data/content.js'
 import ProjectModal from './ProjectModal.vue'
 
+defineProps({ embedded: Boolean })
+
 const active = ref(null)
 
 function openProject(p) { active.value = p }
@@ -48,6 +50,7 @@ function closeProject() { active.value = null }
     <!-- 全屏详情 -->
     <ProjectModal
       v-if="active"
+      :embedded="embedded"
       :title="active.name"
       :subtitle="active.desc"
       :meta="active.tag + ' · ' + active.year"

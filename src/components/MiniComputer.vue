@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { photos } from '../data/content.js'
+import { playSound } from '../utils/sound.js'
 
 // ============================================================
 // 复古收银机 + 凤凰丁神奶彩蛋 v2
@@ -52,6 +53,7 @@ function noteButton(which) {
   if (clickedBtns.size >= 2) {
     hintTimer = setTimeout(() => {
       if (eggState.value !== 'idle') return
+      playSound('mystery')
       eggState.value = 'hint'
       bubbleText.value = EGG_HINT
       bubbleVisible.value = true
@@ -59,23 +61,25 @@ function noteButton(which) {
   }
 }
 
-// 屏幕点击：仅 hint 阶段连点 3 次
+// 屏幕点击：仅 hint 阶段连点 3 次（音效由全局委托处理）
 function onScreenClick() {
   if (eggState.value !== 'hint') return
   screenClicks.value++
   if (screenClicks.value >= 3) startBreaking()
 }
 
-// 凤凰点击：talk 阶段推进对话
+// 凤凰点击：talk 阶段推进对话（音效由全局委托处理）
 function onPhenixClick() {
   if (eggState.value === 'talk') advanceTalk()
 }
 
 // 屏幕碎裂 → 凤凰登场
 function startBreaking() {
+  playSound('crash')
   bubbleVisible.value = false
   eggState.value = 'breaking'
   setTimeout(() => {
+    playSound('horn')   // 登场号角
     eggState.value = 'enter'
     fxImg.value = 1
     fxVisible.value = true
@@ -108,6 +112,7 @@ function advanceTalk() {
 function finishEgg() {
   bubbleVisible.value = false
   eggState.value = 'bye'
+  playSound('fade')
   setTimeout(() => {
     fxVisible.value = false   // 触发滑出动画
     setTimeout(resetEgg, 800)
@@ -134,7 +139,17 @@ function resetEgg() {
 
       <!-- 屏幕 -->
       <div class="mc-screen" :class="{ breaking: eggState === 'breaking', broken: screenBroken }" @click="onScreenClick">
-        <img :src="photos[photoIndex]" alt="屏幕照片" class="mc-photo" :class="{ 'zoom-first': photoIndex === 0 }" />
+        <!-- 照片堆栈：全部常驻 DOM，切换只改 opacity（避免换 src 重绘闪烁） -->
+        <div class="mc-photo-stack" aria-hidden="true">
+          <img
+            v-for="(src, i) in photos"
+            :key="src"
+            :src="src"
+            alt=""
+            class="mc-photo"
+            :class="{ active: i === photoIndex, 'zoom-first': i === 0 }"
+          />
+        </div>
         <div class="mc-scan" aria-hidden="true"></div>
         <!-- 故障效果层 -->
         <div class="glitch-noise" aria-hidden="true"></div>
@@ -194,9 +209,9 @@ import { computed } from 'vue'
 <style scoped>
 .mini-computer {
   position: absolute;
-  right: 492px; top: 278px;
+  right: 417px; top: 278px;
   z-index: 40;
-  width: clamp(190px, 22vw, 250px);
+  width: clamp(170px, 20vw, 225px);
   transition: transform var(--dur) var(--ease-spring);
 }
 
@@ -237,15 +252,22 @@ import { computed } from 'vue'
   border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
 }
+/* 照片堆栈：所有照片叠放，active 控制显示 */
+.mc-photo-stack {
+  position: absolute; inset: 0;
+  overflow: hidden;
+}
 .mc-photo {
+  position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: contain;
-  opacity: 0.13;
-  filter: brightness(0.4);
-  transition: opacity var(--dur) var(--ease-out), filter var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  opacity: 0;
+  /* 不用 will-change/filter：部分 GPU 驱动合成层会丢内容（照片消失） */
+  transition: none;
 }
+.mc-photo.active { opacity: 0.13; }
 .mc-photo.zoom-first { transform: scale(1.01); }
-.screen-on .mc-photo { opacity: 1; filter: brightness(1); }
+.screen-on .mc-photo.active { opacity: 1; }
 
 .mc-scan {
   position: absolute; inset: 0;
@@ -283,7 +305,7 @@ import { computed } from 'vue'
 .mc-screen.broken .glitch-noise,
 .mc-screen.broken .glitch-noise-2,
 .mc-screen.broken .glitch-chip { display: block; }
-.mc-screen.broken .mc-photo { opacity: 0.15; filter: brightness(0.5); }
+.mc-screen.broken .mc-photo.active { opacity: 0.15; }
 
 @keyframes screen-break {
   0%, 100% { transform: none; filter: none; }
@@ -390,10 +412,10 @@ import { computed } from 'vue'
 .btn-red:active, .btn-blue:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,0.3); }
 .btn-red:disabled, .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ======== 凤凰（放大 + 可点击） ======== */
+/* ======== 凤凰（放大 + 可点击；absolute 随页面滚动） ======== */
 .fx-phenix {
-  position: fixed;
-  right: 80px; top: 360px;
+  position: absolute;
+  left: 457px; top: 73px;   /* 相对收银台，左移 1/3 身位（170/3≈57px） */
   width: 170px;
   z-index: 150;
   cursor: pointer;
@@ -405,13 +427,13 @@ import { computed } from 'vue'
 }
 .fx-slide-enter-active { transition: transform 900ms var(--ease-spring); }
 .fx-slide-enter-from { transform: translateX(85vw); }
-.fx-slide-leave-active { transition: transform 2000ms var(--ease-spring); }
+.fx-slide-leave-active { transition: transform 3500ms var(--ease-spring); }   /* 退场慢速 */
 .fx-slide-leave-to { transform: translateX(85vw); }
 
-/* ======== 气泡 v4（Q 版可爱风） ======== */
+/* ======== 气泡 v4（Q 版可爱风；absolute 随页面滚动） ======== */
 .fx-bubble {
-  position: fixed;
-  right: 248px; top: 360px;   /* 右移半个身位 */
+  position: absolute;
+  left: 286px; top: 73px;   /* 相对收银台，左移 1/3 身位（180/3=60px） */
   width: 180px;
   background: #fffdf6;                 /* 奶油白 */
   border: 3px solid var(--ink);
@@ -445,8 +467,8 @@ import { computed } from 'vue'
   border-left-color: var(--ink);
   border-radius: 2px;
 }
-/* hint 指向收银台（左侧） */
-.fx-bubble.hint { right: 158px; top: 320px; }
+/* hint 指向收银台（左侧；随页面移动；左移 1/3 身位） */
+.fx-bubble.hint { left: 279px; top: 33px; }
 .fx-bubble.hint::after {
   left: auto; right: 100%;
   border: 9px solid transparent;
@@ -455,12 +477,18 @@ import { computed } from 'vue'
 
 /* 语句切换：先缩小再弹大（1 秒，更明显） */
 .bubble-pop-enter-active { animation: bubble-pop 1000ms var(--ease-spring); }
+/* hint 提示气泡：柔和淡入（无弹跳，避免看起来像闪烁） */
+.fx-bubble.hint { animation: bubble-fade-in 350ms ease both; }
 .bubble-pop-leave-active { transition: opacity 180ms ease; }
 .bubble-pop-leave-to { opacity: 0; }
 @keyframes bubble-pop {
   0% { opacity: 0; transform: scale(0.55); }
-  65% { opacity: 1; transform: scale(1.12); }
-  100% { transform: scale(1); }
+  70% { transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes bubble-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 767px) {

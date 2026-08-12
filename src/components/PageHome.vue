@@ -5,6 +5,10 @@ import ProjectsShowcase from './ProjectsShowcase.vue'
 import BurgerSection from './BurgerSection.vue'
 import MiniComputer from './MiniComputer.vue'
 
+// embedded：被内嵌在笔记本屏幕门户里（ScreenPortal）时的模式
+// 隐藏右下角小电脑、改根高度为 100% 适配门户滚动容器
+defineProps({ embedded: Boolean })
+
 const nameClicked = ref(false)
 
 // 彩蛋1：点名字变印章
@@ -20,7 +24,7 @@ function scrollToBurger() {
 </script>
 
 <template>
-  <div class="home">
+  <div class="home" :class="{ 'is-embedded': embedded }">
     <!-- ======== 导航 ======== -->
     <header class="nav">
       <div class="container nav-inner">
@@ -86,18 +90,20 @@ function scrollToBurger() {
     </section>
 
     <!-- ======== 项目精选 ======== -->
-    <ProjectsShowcase />
+    <ProjectsShowcase :embedded="embedded" />
 
     <!-- ======== 汉堡包秘方（技能墙以下整块） ======== -->
     <BurgerSection />
 
-    <!-- ======== 右下角小电脑 ======== -->
+    <!-- ======== 复古收银机（内嵌与全站模式都显示） ======== -->
     <MiniComputer />
   </div>
 </template>
 
 <style scoped>
 .home { min-height: 100dvh; position: relative; }
+/* 内嵌模式：由门户滚动容器撑高度，而不是视口 */
+.home.is-embedded { min-height: 100%; }
 
 /* ---------- 导航 ---------- */
 .nav {

@@ -1,13 +1,14 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 
-defineProps({
+const props = defineProps({
   title: String,
   subtitle: String,
   meta: String,
   body: Object,
   href: String,   // 项目/GitHub 链接（可选）
-  hrefLabel: String  // 按钮文字（默认"查看项目"）
+  hrefLabel: String,  // 按钮文字（默认"查看项目"）
+  embedded: Boolean   // 内嵌在笔记本屏幕门户里时，弹层投影到门户内
 })
 const emit = defineEmits(['close'])
 
@@ -15,19 +16,26 @@ const emit = defineEmits(['close'])
 function onKey(e) {
   if (e.key === 'Escape') emit('close')
 }
+
+function portalScrollEl() {
+  return document.querySelector('.screen-portal .portal-scroll')
+}
+
 onMounted(() => {
   window.addEventListener('keydown', onKey)
-  document.body.style.overflow = 'hidden'
+  const el = props.embedded ? portalScrollEl() : document.body
+  if (el) el.style.overflow = 'hidden'
 })
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
-  document.body.style.overflow = ''
+  const el = props.embedded ? portalScrollEl() : document.body
+  if (el) el.style.overflow = ''
 })
 </script>
 
 <template>
-  <!-- 全屏详情（meowj 式 case study） -->
-  <Teleport to="body">
+  <!-- 全屏详情（meowj 式 case study）；内嵌时投射进笔记本屏幕门户 -->
+  <Teleport :to="embedded ? '.screen-portal' : 'body'">
     <div class="project-modal" role="dialog" aria-modal="true">
       <div class="pm-backdrop" @click="emit('close')"></div>
       <div class="pm-panel">
@@ -101,8 +109,8 @@ onUnmounted(() => {
 
 .pm-panel {
   position: relative;
-  width: min(720px, 92vw);
-  max-height: 86vh;
+  width: min(720px, 92%);
+  max-height: 86%;
   background: var(--cream);
   border: 2px solid var(--ink);
   border-radius: var(--radius-lg);
