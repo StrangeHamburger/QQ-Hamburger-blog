@@ -6,7 +6,7 @@ export const profile = {
   name: 'QQ Hamburger',        // 名字
   nameCn: 'QQ 汉堡',
   title: '25届计算机科学与技术专业',
-  tagline: '在深海和代码之间，构建有趣的东西。',
+  tagline: '1816414891@qq.com',
   stamp: 'CS 2025',            // 印章文字
   employeeId: 'EMPLOYEE #025'
 }
@@ -21,11 +21,7 @@ export const photos = [
   '/src/assets/photo-6.jpg'
 ]
 
-export const stats = [
-  { num: '01', label: 'YEARS OF CS' },
-  { num: '01', label: 'PROJECTS SHIPPED' },
-  { num: '06', label: 'TECH STACKS' }
-]
+export const stats = []   // 数据条已删除（两端），保留空导出以防其他引用
 
 export const skills = [
   'Vue 3', 'TypeScript', 'Python', 'Node.js',

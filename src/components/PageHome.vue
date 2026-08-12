@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { profile, stats } from '../data/content.js'
+import { profile } from '../data/content.js'
 import ProjectsShowcase from './ProjectsShowcase.vue'
 import BurgerSection from './BurgerSection.vue'
 import MiniComputer from './MiniComputer.vue'
@@ -64,15 +64,13 @@ function scrollToBurger() {
           <h1 class="hero-name" :class="{ stamped: nameClicked }">{{ profile.name }}</h1>
           <span class="hero-stamp mono-label">{{ profile.stamp }}</span>
         </div>
-        <p class="hero-tagline">{{ profile.tagline }}</p>
-
-        <!-- 数据条 -->
-        <div class="hero-stats">
-          <div v-for="s in stats" :key="s.label" class="stat">
-            <span class="stat-num mono-label">{{ s.num }}</span>
-            <span class="stat-label mono-label">{{ s.label }}</span>
-          </div>
-        </div>
+        <p class="hero-tagline">
+          <svg class="tagline-mail" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 5h18v14H3V5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M3 6.5 12 13l9-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ profile.tagline }}</span>
+        </p>
 
         <!-- 按钮 -->
         <div class="hero-actions">
@@ -227,19 +225,18 @@ function scrollToBurger() {
   font-size: clamp(16px, 2vw, 20px);
   color: var(--ink-70);
   max-width: 30ch;
+  display: flex;   /* 块级 flex：独占一行，邮箱在名字正下方 */
+  align-items: center;
+  gap: 7px;
+  margin-left: 16px;   /* 整体右移两个字母宽 */
 }
-
-/* 数据条 */
-.hero-stats {
-  display: flex; gap: var(--space-5);
-  margin-top: var(--space-5);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--ink-08);
-  flex-wrap: wrap;
+/* 邮箱前的信封图标 */
+.tagline-mail {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  opacity: 0.85;
 }
-.stat { display: flex; flex-direction: column; }
-.stat-num { font-size: 26px; font-weight: 700; color: var(--navy); }
-.stat-label { font-size: 10px; color: var(--ink-50); margin-top: 2px; }
 
 /* 按钮 */
 .hero-actions { display: flex; gap: var(--space-3); margin-top: var(--space-5); flex-wrap: wrap; }
@@ -261,10 +258,16 @@ function scrollToBurger() {
 .btn-ghost:hover { transform: translateY(-2px); border-color: var(--tomato); color: var(--tomato); }
 
 /* ---------- 响应式 ---------- */
+@media (min-width: 768px) {
+  /* 电脑端：两个按钮及其以下整体下移两个按键身位（~90px） */
+  .hero-actions { margin-top: calc(var(--space-5) + 90px); }
+  /* 电脑端：邮箱账号往下移一行（~30px） */
+  .hero-tagline { margin-top: calc(var(--space-4) + 30px); }
+}
+
 @media (max-width: 767px) {
   .hero { padding-top: var(--space-5); }
   .hero-wave { width: 180px; height: 180px; right: -30px; }
-  .hero-stats { gap: var(--space-4); }
   .nav-burger-text { display: none; }
 }
 </style>

@@ -190,13 +190,14 @@ function resetEgg() {
       </div>
     </transition>
 
-    <!-- 气泡（hint 尖尖指收银台 / talk 尖尖指凤凰） -->
+    <!-- 气泡（hint 尖尖指收银台 / talk 尖尖指凤凰；所有气泡可点击推进对话，= 点凤凰效果） -->
     <transition name="bubble-pop">
       <div
         v-if="bubbleVisible"
         :key="talkIndex"
         class="fx-bubble"
-        :class="{ hint: eggState === 'hint' }"
+        :class="{ hint: eggState === 'hint', tappable: true, first: talkIndex === 0 }"
+        @click="onPhenixClick()"
       >{{ bubbleText }}</div>
     </transition>
   </div>
@@ -475,6 +476,9 @@ import { computed } from 'vue'
   border-right-color: var(--ink);
 }
 
+/* 气泡：可点击推进对话（= 点击凤凰效果） */
+.fx-bubble.tappable { cursor: pointer; }
+
 /* 语句切换：先缩小再弹大（1 秒，更明显） */
 .bubble-pop-enter-active { animation: bubble-pop 1000ms var(--ease-spring); }
 /* hint 提示气泡：柔和淡入（无弹跳，避免看起来像闪烁） */
@@ -492,8 +496,7 @@ import { computed } from 'vue'
 }
 
 @media (max-width: 767px) {
-  .fx-phenix { right: 16px; top: auto; bottom: 100px; width: 120px; }
-  .fx-bubble { right: 24px; top: auto; bottom: 230px; width: 130px; font-size: 12px; }
-  .fx-bubble.hint { right: 24px; top: auto; bottom: 230px; }
+  /* 移动端适配已全部集中到 MobileHome.vue（:deep 覆盖），本文件保持桌面端纯净 */
 }
 </style>
+
