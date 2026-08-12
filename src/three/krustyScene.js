@@ -242,7 +242,7 @@ export function createKrustyScene(el, opts = {}) {
   scene.add(burger)
 
   const drink = new THREE.Group()
-  drink.position.set(2.6, TABLE_TOP, -0.3)
+  drink.position.set(2.4, TABLE_TOP, 0.1)   // 往左移一点（x 2.6→2.4）
   drink.rotation.y = -0.5
   buildDrink(drink)
   scene.add(drink)
@@ -1085,13 +1085,16 @@ function buildBurger(group) {
 
 // 饮料：玻璃杯 + 可乐 + 冰块 + 泡沫 + 吸管
 function buildDrink(group) {
+  // 放大 2 倍后再缩到 0.8 → 1.6 倍
+  group.scale.set(1.6, 1.6, 1.6)
   // 质感优化：玻璃透亮、可乐深棕、冰块晶莹
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: 0xdff2ff, roughness: 0.04, metalness: 0,
     transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false
   })
   const liquidMat = new THREE.MeshStandardMaterial({
-    color: 0x2a1004, roughness: 0.2   // 可乐深棕
+    color: 0x2a1004, roughness: 0.2,
+    transparent: true, opacity: 0.9   // 半透明：能看到内部气泡
   })
   const foamMat = new THREE.MeshStandardMaterial({ color: 0xc8a886, roughness: 0.8 })  // 可乐泡沫
   const iceMat = new THREE.MeshStandardMaterial({
@@ -1129,6 +1132,28 @@ function buildDrink(group) {
   straw.position.set(0.15, 0.78, 0)
   straw.rotation.z = -0.32
   group.add(straw)
+  // 可乐气泡细节：液体内部悬浮小气泡 + 液面浮泡
+  const bubbleMat = new THREE.MeshStandardMaterial({
+    color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.75
+  })
+  const rand = (a, b) => a + Math.random() * (b - a)
+  for (let i = 0; i < 24; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.006, 0.022), 8, 6), bubbleMat)
+    const ang = Math.random() * TAU
+    bub.position.set(
+      Math.cos(ang) * rand(0.03, 0.2),
+      rand(0.08, 0.5),
+      Math.sin(ang) * rand(0.03, 0.2)
+    )
+    group.add(bub)
+  }
+  // 液面浮泡（大一点，贴着泡沫层）
+  for (let i = 0; i < 7; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.015, 0.03), 8, 6), bubbleMat)
+    const ang = Math.random() * TAU
+    bub.position.set(Math.cos(ang) * rand(0.02, 0.18), rand(0.55, 0.6), Math.sin(ang) * rand(0.02, 0.18))
+    group.add(bub)
+  }
 }
 
 // 方形观景窗：直角矩形框 + 海底玻璃 + 底部窗台（无弧形）
