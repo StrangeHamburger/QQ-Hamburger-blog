@@ -8,6 +8,20 @@ import { initGlobalClickSound } from './utils/sound.js'
 // 全局点击音效（深海餐厅主题，按元素自动选音）
 onMounted(initGlobalClickSound)
 
+// 图片预加载：页面加载完成即提前拉取未挂载 DOM 的图片（敬请期待/彩蛋/卷轴冒图等），
+// 用户滚动到对应区域时图片已在缓存里，秒开
+onMounted(() => {
+  const preloadList = [
+    'scroll-out.png', 'soon.png',
+    'fx-1.png', 'fx-2.png', 'fx-3.png', 'fx-4.png',
+    'hobby-sport.jpg', 'hobby-game.jpg'
+  ]
+  preloadList.forEach((u) => {
+    const img = new Image()
+    img.src = import.meta.env.BASE_URL + 'assets/' + u
+  })
+})
+
 // 移动端直接显示网站页面，不进入 3D 房间场景（性能 + 交互适配）
 const isMobile = ref(false)
 let mq = null
