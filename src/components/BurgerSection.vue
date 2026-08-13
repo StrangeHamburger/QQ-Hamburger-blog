@@ -35,8 +35,7 @@ function onSelectLayer(i) {
 }
 function closeDetail() {
   detailOpen.value = false
-  // 先让面板滑出（350ms），动画完成后再卸载内容（避免退出瞬间消失）
-  setTimeout(() => { activeId.value = '' }, 380)
+  activeId.value = ''   // v-if 变 false → Vue transition 走滑出动画（380ms）后自动卸载
 }
 </script>
 
@@ -86,20 +85,22 @@ function closeDetail() {
       </div>
     </div>
 
-    <!-- 详情面板（右侧滑出） -->
+    <!-- 详情面板（右侧滑出/滑入，Vue transition 接管完整开关动画） -->
     <div class="drawer" :class="{ open: detailOpen }">
       <div class="drawer-backdrop" @click="closeDetail"></div>
-      <div class="drawer-panel" v-if="detailOpen || activeMeta">
-        <!-- 关闭时 activeMeta 保留 380ms，面板先滑出再卸载 -->        <div class="drawer-head">
-          <span class="drawer-num mono-label">{{ activeMeta.num }}</span>
-          <span class="drawer-name">{{ activeMeta.name }}</span>
-          <span class="drawer-channel mono-label">{{ activeMeta.channel }}</span>
-          <button class="drawer-close" @click="closeDetail" aria-label="关闭">×</button>
+      <transition name="drawer">
+        <div class="drawer-panel" v-if="detailOpen || activeMeta">
+          <div class="drawer-head">
+            <span class="drawer-num mono-label">{{ activeMeta.num }}</span>
+            <span class="drawer-name">{{ activeMeta.name }}</span>
+            <span class="drawer-channel mono-label">{{ activeMeta.channel }}</span>
+            <button class="drawer-close" @click="closeDetail" aria-label="关闭">×</button>
+          </div>
+          <div class="drawer-body">
+            <component :is="activeChannel" v-if="activeChannel" />
+          </div>
         </div>
-        <div class="drawer-body">
-          <component :is="activeChannel" v-if="activeChannel" />
-        </div>
-      </div>
+      </transition>
     </div>
   </section>
 </template>
@@ -210,11 +211,14 @@ function closeDetail() {
   width: clamp(340px, 38vw, 520px);
   background: var(--cream);
   box-shadow: -4px 0 30px rgba(26,26,24,0.15);
-  transform: translateX(100%);
-  transition: transform 350ms var(--ease-out);
   display: flex; flex-direction: column; overflow: hidden;
 }
-.drawer.open .drawer-panel { transform: translateX(0); }
+/* 开关动画：打开滑入 480ms / 关闭滑出 380ms（比之前慢，完整过渡） */
+.drawer-enter-active { transition: transform 480ms var(--ease-out); }
+.drawer-enter-from { transform: translateX(100%); }
+.drawer-enter-to { transform: translateX(0); }
+.drawer-leave-active { transition: transform 380ms var(--ease-out); }
+.drawer-leave-to { transform: translateX(100%); }
 
 .drawer-head {
   padding: 18px 22px; border-bottom: 1px solid var(--ink-08);
