@@ -44,7 +44,7 @@ function onSelect(i) { emit('select-layer', i) }
 
     <!-- 打开后：从卷轴后方往左冒出的图 -->
     <transition name="pop-left">
-      <img :src="assetsBase + 'scroll-out.png'" alt="" class="scroll-out-img" aria-hidden="true" />
+      <img v-if="open" :src="assetsBase + 'scroll-out.png'" alt="" class="scroll-out-img" aria-hidden="true" />
     </transition>
 
     <!-- 展开面板：从纸卷里浮现（grid-rows + opacity 平滑过渡） -->
