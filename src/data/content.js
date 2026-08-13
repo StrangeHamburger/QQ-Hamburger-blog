@@ -88,6 +88,7 @@ export const resume = {
 export const projects = [
   {
     no: '01',
+    id: 'qq-hamburger-blog',   // 路由 id（/projects/:id）
     name: 'QQ Hamburger Blog',
     desc: '个人博客，记录汉堡与代码的日常',
     year: '2026',

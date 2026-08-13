@@ -1,14 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { projects } from '../data/content.js'
-import ProjectModal from './ProjectModal.vue'
 
 defineProps({ embedded: Boolean })
 
-const active = ref(null)
+const router = useRouter()
 
-function openProject(p) { active.value = p }
-function closeProject() { active.value = null }
+// 项目详情改为独立路由页（/projects/:id），可分享 URL（meowj 式）
+function openProject(p) {
+  router.push('/projects/' + p.id)
+}
 </script>
 
 <template>
@@ -47,17 +48,7 @@ function closeProject() { active.value = null }
       </div>
     </div>
 
-    <!-- 全屏详情 -->
-    <ProjectModal
-      v-if="active"
-      :embedded="embedded"
-      :title="active.name"
-      :subtitle="active.desc"
-      :meta="active.tag + ' · ' + active.year"
-      :body="active.detail"
-      :href="active.href"
-      @close="closeProject"
-    />
+    <!-- 项目详情为独立路由页：/projects/:id（点击小方块跳转） -->
   </section>
 </template>
 
