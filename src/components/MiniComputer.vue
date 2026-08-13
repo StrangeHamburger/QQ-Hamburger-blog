@@ -434,7 +434,7 @@ import { computed } from 'vue'
 }
 .fx-slide-enter-active { transition: transform 900ms var(--ease-spring); }
 .fx-slide-enter-from { transform: translateX(85vw); }
-.fx-slide-leave-active { transition: transform 3500ms var(--ease-spring); }   /* 退场慢速 */
+.fx-slide-leave-active { transition: transform 4500ms var(--ease-spring); }   /* 退场慢速（3500→4500） */
 .fx-slide-leave-to { transform: translateX(85vw); }
 
 /* ======== 气泡 v4（Q 版可爱风；absolute 随页面滚动） ======== */
