@@ -40,6 +40,11 @@ import PageHome from './PageHome.vue'
   width: 180px;
 }
 
+/* 手机端：卷轴未打开时，图上黑线与卷轴边缘重合（200px 图时黑线在 137px 处） */
+:deep(.scroll-top) {
+  margin-bottom: -63px;
+}
+
 /* 收银台：固定在页面左侧随滚动（absolute 相对 .home），形状与电脑端一致 */
 :deep(.mini-computer) {
   position: absolute;
