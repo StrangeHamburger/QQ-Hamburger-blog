@@ -13,10 +13,16 @@ import PageHome from './PageHome.vue'
 
 /* hero 重排：名字 → tagline → [收银台 absolute] → 按钮（数据条已删，下移量合并到按钮） */
 :deep(.hero-actions) {
-  margin-top: 336px;   /* 按钮整体往下移（避开收银台 + 一个身位） */
+  margin-top: 392px;   /* 按钮下移（避开收银台：字号缩小后 hero 上移，336→392 补偿） */
   position: relative;
   z-index: 30;         /* 图层最上层：按钮不透明实色，盖住任何背景图案 */
 }
+
+/* 排版微调 v3.1：名字→邮箱 26px（原 20px 偏紧） */
+:deep(.hero-tagline) {
+  margin-top: 26px;
+}
+
 :deep(.hero-actions .btn) {
   background: var(--tomato);   /* 查看汉堡秘方：实色不透明 */
 }
@@ -50,7 +56,7 @@ import PageHome from './PageHome.vue'
   position: absolute;
   left: 12px;
   right: auto;
-  top: 240px;
+  top: 249px;   /* v3.1：邮箱→收银台 26px 间距（原 240 只留 17px） */
   width: clamp(170px, 20vw, 225px);
   z-index: 60;
 }

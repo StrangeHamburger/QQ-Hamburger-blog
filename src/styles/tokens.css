@@ -25,8 +25,8 @@
   --font-serif: 'Noto Serif SC', 'Source Han Serif SC', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
 
-  /* 字号阶梯 */
-  --text-hero: clamp(48px, 9vw, 108px);
+  /* 字号阶梯（v3.1：hero 上限微调，移动端不压屏） */
+  --text-hero: clamp(44px, 8.5vw, 104px);
   --text-h1: clamp(30px, 5vw, 52px);
   --text-h2: clamp(20px, 3vw, 28px);
   --text-body: 16px;
@@ -48,12 +48,12 @@
   --radius: 10px;
   --radius-lg: 18px;
 
-  /* 动效 */
-  --dur-fast: 180ms;
-  --dur: 300ms;
-  --dur-slow: 500ms;
-  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* 动效（v3.1 丝滑化：easeOutExpo 缓动 + 更干脆的时长） */
+  --dur-fast: 160ms;
+  --dur: 260ms;
+  --dur-slow: 400ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);          /* easeOutExpo：快起慢落，丝滑 */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* 过冲回弹：保留 */
 
   /* 阴影（双色投影，质感来源） */
   --shadow-card: 0 2px 0 var(--ink-12), 0 8px 24px rgba(26, 26, 24, 0.06);

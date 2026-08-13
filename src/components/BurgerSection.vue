@@ -198,7 +198,7 @@ function closeDetail() { detailOpen.value = false }
 .drawer-backdrop {
   position: absolute; inset: 0;
   background: rgba(26,26,24,0.28);
-  opacity: 0; transition: opacity 300ms ease;
+  opacity: 0; transition: opacity var(--dur) var(--ease-out);
 }
 .drawer.open .drawer-backdrop { opacity: 1; }
 .drawer-panel {

@@ -111,7 +111,7 @@ function onSelect(i) { emit('select-layer', i) }
   z-index: 3;
   pointer-events: none;                /* 不拦截鼠标，hover 穿透到卷轴 */
   filter: drop-shadow(0 6px 12px rgba(26, 26, 24, 0.18));
-  transition: height 450ms var(--ease-out), margin-bottom 450ms var(--ease-out);  /* 无 opacity 过渡：避免关闭时与 scroll-out 淡出叠加产生虚影 */
+  transition: height 380ms var(--ease-out), margin-bottom 380ms var(--ease-out);  /* 无 opacity 过渡：避免关闭时与 scroll-out 淡出叠加产生虚影 */
 }
 .scroll-top.hide {
   height: 0;
@@ -135,7 +135,7 @@ function onSelect(i) { emit('select-layer', i) }
   pointer-events: none;
 }
 .pop-left-enter-active {
-  transition: opacity 500ms ease, transform 650ms var(--ease-spring);
+  transition: opacity 400ms ease, transform 500ms var(--ease-spring);
 }
 .pop-left-enter-from {
   opacity: 0;
@@ -173,7 +173,7 @@ function onSelect(i) { emit('select-layer', i) }
   align-items: center; justify-content: center;
   gap: 10px; position: relative;
   box-shadow: 0 2px 10px rgba(26,26,24,0.06);
-  transition: min-height 480ms var(--ease-out), background 480ms ease;
+  transition: min-height 420ms var(--ease-out), background 420ms ease;
 }
 
 /* 展开时：纸面变高（接住面板） */
@@ -218,7 +218,7 @@ function onSelect(i) { emit('select-layer', i) }
   overflow: hidden;
   opacity: 0;
   transform: translateY(-8px);
-  transition: grid-template-rows 520ms var(--ease-out), opacity 360ms ease 120ms, transform 520ms var(--ease-out);
+  transition: grid-template-rows 460ms var(--ease-out), opacity 320ms ease 100ms, transform 460ms var(--ease-out);
 }
 .formula-panel.expanded {
   grid-template-rows: 1fr;
