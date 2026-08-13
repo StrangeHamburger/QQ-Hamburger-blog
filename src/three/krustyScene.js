@@ -1132,23 +1132,8 @@ function buildDrink(group) {
   const liquid = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.23, 0.55, 32), liquidMat)
   liquid.position.y = 0.3
   group.add(liquid)
-  // 顶部泡沫层：细密颗粒铺满液面（取代圆盘+边缘粒的两层结构，单层更自然）
+  // 顶部泡沫层已移除（用户不要液面泡沫），保留内部上升气泡
   const rand = (a, b) => a + Math.random() * (b - a)
-  const foamMat = new THREE.MeshStandardMaterial({ color: 0xc8a886, roughness: 0.8 })  // 可乐泡沫
-  const edgeBubbleMat = new THREE.MeshStandardMaterial({
-    color: 0xe8d2b8, roughness: 0.6, transparent: true, opacity: 0.55
-  })
-  for (let i = 0; i < 38; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.005, 0.016), 8, 6), edgeBubbleMat)
-    const ang = Math.random() * TAU
-    const rr = rand(0.02, 0.24)
-    bub.position.set(
-      Math.cos(ang) * rr,
-      rand(0.55, 0.61),
-      Math.sin(ang) * rr
-    )
-    group.add(bub)
-  }
   // 冰立方
   for (let i = 0; i < 3; i++) {
     const ice = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), iceMat)
