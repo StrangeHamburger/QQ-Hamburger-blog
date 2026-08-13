@@ -96,7 +96,7 @@ export const projects = [
     image: import.meta.env.BASE_URL + 'assets/project-1.jpg',  // 项目封面图
     href: 'https://github.com/StrangeHamburger/QQ-Hamburger-blog',  // 项目链接（GitHub/线上地址）
     detail: {
-      intro: '个人网站，把深海餐厅开进了浏览器里。',
+      intro: '一个装满汉堡秘方和代码彩蛋的个人站。',
       sections: [
         {
           type: 'paras',
