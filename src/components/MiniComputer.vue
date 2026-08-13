@@ -5,6 +5,9 @@ import { ref } from 'vue'
 import { photos } from '../data/content.js'
 import { playSound } from '../utils/sound.js'
 
+// 照片雪碧图：6 张合成 1 张（请求数 6→1，手机端加载更快），切换用 object-position 切片
+const spritePhoto = import.meta.env.BASE_URL + 'assets/sprite-photos.webp'
+
 // ============================================================
 // 复古收银机 + 凤凰丁神奶彩蛋 v2
 // 触发：红+蓝按钮各点一次 → 3 秒后气泡提示（尖尖指收银台）
@@ -144,9 +147,10 @@ function resetEgg() {
         <!-- 照片堆栈：全部常驻 DOM，切换只改 opacity（避免换 src 重绘闪烁） -->
         <div class="mc-photo-stack" aria-hidden="true">
           <img
-            v-for="(src, i) in photos"
-            :key="src"
-            :src="src"
+            v-for="(p, i) in photos"
+            :key="i"
+            :src="spritePhoto"
+            :style="{ objectPosition: i * 20 + '% 50%' }"
             alt=""
             class="mc-photo"
             :class="{ active: i === photoIndex, 'zoom-first': i === 0 }"
@@ -263,7 +267,7 @@ import { computed } from 'vue'
 .mc-photo {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  object-fit: contain;
+  object-fit: cover;             /* 雪碧图切片：cover 按高缩放，object-position 20% 步进切出对应照片 */
   opacity: 0;
   /* 不用 will-change/filter：部分 GPU 驱动合成层会丢内容（照片消失） */
   transition: none;

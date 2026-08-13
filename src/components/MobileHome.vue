@@ -35,6 +35,11 @@ import PageHome from './PageHome.vue'
   font-size: 11px;
 }
 
+/* 手机端隐藏 hero 波浪装饰（在按钮后面透出，显得乱） */
+:deep(.hero-wave) {
+  display: none;
+}
+
 /* 左下角海草：手机端空间被收银台/按钮占满，上移会与按钮重叠，隐藏 */
 :deep(.hero-seaweed) {
   display: none;
