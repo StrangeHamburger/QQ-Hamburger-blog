@@ -1099,7 +1099,6 @@ function buildDrink(group) {
     color: 0x1f0b02, roughness: 0.15, metalness: 0,
     transparent: true, opacity: 0.92   // 半透明：能看到内部气泡
   })
-  const foamMat = new THREE.MeshStandardMaterial({ color: 0xc8a886, roughness: 0.8 })  // 可乐泡沫
   const iceMat = new THREE.MeshStandardMaterial({
     color: 0xd8f0ff, roughness: 0.08, transparent: true, opacity: 0.92
   })
@@ -1119,10 +1118,23 @@ function buildDrink(group) {
   const liquid = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.23, 0.55, 32), liquidMat)
   liquid.position.y = 0.3
   group.add(liquid)
-  // 顶部泡沫层
-  const foam = new THREE.Mesh(new THREE.CylinderGeometry(0.255, 0.26, 0.035, 32), foamMat)
-  foam.position.y = 0.575
-  group.add(foam)
+  // 顶部泡沫层：细密颗粒铺满液面（取代圆盘+边缘粒的两层结构，单层更自然）
+  const rand = (a, b) => a + Math.random() * (b - a)
+  const foamMat = new THREE.MeshStandardMaterial({ color: 0xc8a886, roughness: 0.8 })  // 可乐泡沫
+  const edgeBubbleMat = new THREE.MeshStandardMaterial({
+    color: 0xe8d2b8, roughness: 0.6, transparent: true, opacity: 0.55
+  })
+  for (let i = 0; i < 38; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.005, 0.016), 8, 6), edgeBubbleMat)
+    const ang = Math.random() * TAU
+    const rr = rand(0.02, 0.24)
+    bub.position.set(
+      Math.cos(ang) * rr,
+      rand(0.55, 0.61),
+      Math.sin(ang) * rr
+    )
+    group.add(bub)
+  }
   // 冰立方
   for (let i = 0; i < 3; i++) {
     const ice = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), iceMat)
@@ -1139,7 +1151,6 @@ function buildDrink(group) {
   const bubbleMat = new THREE.MeshStandardMaterial({
     color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.55
   })
-  const rand = (a, b) => a + Math.random() * (b - a)
   for (let i = 0; i < 20; i++) {
     const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.014), 8, 6), bubbleMat)
     const ang = Math.random() * TAU
@@ -1147,22 +1158,6 @@ function buildDrink(group) {
       Math.cos(ang) * rand(0.03, 0.19),
       rand(0.1, 0.48),
       Math.sin(ang) * rand(0.03, 0.19)
-    )
-    group.add(bub)
-  }
-  // 泡沫边缘细粒（取代原来生硬的液面大浮泡）：细密小泡沿杯口一圈错落分布，
-  // 低透明度、大小不一，营造真实可乐泡沫边缘的绵密感
-  const edgeBubbleMat = new THREE.MeshStandardMaterial({
-    color: 0xe8d2b8, roughness: 0.6, transparent: true, opacity: 0.5
-  })
-  for (let i = 0; i < 22; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.013), 8, 6), edgeBubbleMat)
-    const ang = (i / 22) * TAU + rand(-0.08, 0.08)
-    const rr = rand(0.17, 0.24)
-    bub.position.set(
-      Math.cos(ang) * rr,
-      rand(0.552, 0.608),
-      Math.sin(ang) * rr
     )
     group.add(bub)
   }
