@@ -70,6 +70,16 @@ function onPortalHit(e) {
   }
 }
 function onPortalWheel(e) {
+  // 弹窗打开时：滚轮滚弹窗内部（.pm-body），否则滚门户主体
+  const modalBody = document.querySelector('.project-modal .pm-body')
+  if (modalBody) {
+    const prev = modalBody.style.scrollBehavior
+    modalBody.style.scrollBehavior = 'auto'
+    modalBody.scrollTop += e.deltaY
+    modalBody.style.scrollBehavior = prev
+    e.preventDefault()
+    return
+  }
   const ps = document.querySelector('.screen-portal .portal-scroll')
   if (ps) {
     // 临时关掉 scroll-behavior: smooth——增量滚轮与 smooth 动画互相打断（滚不动/卡顿）
