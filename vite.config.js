@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  base: '/QQ-Hamburger-blog/',   // GitHub Pages 子路径部署（绑自定义域名后改回 '/'）
+  base: '/',   // 自定义域名部署（qqhamburger.top 根路径）
   server: {
     host: true,
     port: 5173,
