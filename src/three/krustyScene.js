@@ -1115,7 +1115,7 @@ function buildDrink(group) {
     transparent: true, opacity: 0.92   // 半透明：能看到内部气泡
   })
   const iceMat = new THREE.MeshStandardMaterial({
-    color: 0xd8f0ff, roughness: 0.08, transparent: true, opacity: 0.92
+    color: 0xd8f0ff, roughness: 0.08, transparent: true, opacity: 0.75   // 冰块更透明（0.92→0.75）
   })
   const strawMat = new THREE.MeshStandardMaterial({ color: 0xe85535, roughness: 0.3 })
 
@@ -1135,17 +1135,17 @@ function buildDrink(group) {
   group.add(liquid)
   // 顶部泡沫层已移除（用户不要液面泡沫），保留内部上升气泡
   const rand = (a, b) => a + Math.random() * (b - a)
-  // 液面贴壁细泡：沿杯壁一圈极小的半透明气泡（像真可乐杯沿的气泡，不起眼但液面不空）
+  // 液面贴壁细泡：沿杯壁一圈半透明气泡（大小/透明度提升，液面可见但不突兀）
   const rimMat = new THREE.MeshStandardMaterial({
-    color: 0xe8d2b8, roughness: 0.5, transparent: true, opacity: 0.35
+    color: 0xe8d2b8, roughness: 0.5, transparent: true, opacity: 0.6
   })
-  for (let i = 0; i < 14; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.003, 0.007), 8, 6), rimMat)
-    const ang = (i / 14) * TAU + rand(-0.1, 0.1)
+  for (let i = 0; i < 16; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.005, 0.011), 8, 6), rimMat)
+    const ang = (i / 16) * TAU + rand(-0.1, 0.1)
     bub.position.set(
-      Math.cos(ang) * rand(0.235, 0.255),
-      rand(0.52, 0.56),
-      Math.sin(ang) * rand(0.235, 0.255)
+      Math.cos(ang) * rand(0.21, 0.245),
+      rand(0.52, 0.565),
+      Math.sin(ang) * rand(0.21, 0.245)
     )
     group.add(bub)
   }
@@ -1163,11 +1163,11 @@ function buildDrink(group) {
   group.add(straw)
   // 可乐气泡细节：液体内部悬浮小气泡（小、淡，带上升动画）
   const bubbleMat = new THREE.MeshStandardMaterial({
-    color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.55
+    color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.75
   })
   const drinkBubbles = []
-  for (let i = 0; i < 20; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.014), 8, 6), bubbleMat)
+  for (let i = 0; i < 26; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.006, 0.02), 8, 6), bubbleMat)
     const ang = Math.random() * TAU
     bub.position.set(
       Math.cos(ang) * rand(0.03, 0.19),
