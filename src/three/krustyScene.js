@@ -509,7 +509,7 @@ export function createKrustyScene(el, opts = {}) {
   window.addEventListener('resize', onResize)
 
   // ==================== 主循环 ====================
-  const clock = new THREE.Clock()
+  let lastTime = performance.now()   // THREE.Clock 已弃用，改用 performance.now 计时
   let t = 0
   let raf = 0
 
@@ -527,7 +527,9 @@ export function createKrustyScene(el, opts = {}) {
 
   function tick() {
     raf = requestAnimationFrame(tick)
-    const dtRaw = clock.getDelta()
+    const now = performance.now()
+    const dtRaw = (now - lastTime) / 1000
+    lastTime = now
     const dt = Math.min(dtRaw, 0.05)          // 视觉动画域
     const tweenDt = Math.min(dtRaw, 0.5)      // 相机补间域（headless 低帧率也能按墙钟完成）
     t += dt
