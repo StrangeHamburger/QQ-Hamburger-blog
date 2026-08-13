@@ -95,11 +95,27 @@ function scrollToBurger() {
 
     <!-- ======== 复古收银机（内嵌与全站模式都显示） ======== -->
     <MiniComputer />
+
+    <!-- ======== 页脚：访客统计（不蒜子） ======== -->
+    <footer class="site-footer">
+      <span class="mono-label">
+        🦀 被踩点 <span id="busuanzi_value_site_pv"></span> 次 · 来过
+        <span id="busuanzi_value_site_uv"></span> 只蟹 · © 2026 QQ Hamburger
+      </span>
+    </footer>
   </div>
 </template>
 
 <style scoped>
 .home { min-height: 100dvh; position: relative; }
+/* 页脚：访客统计条 */
+.site-footer {
+  text-align: center;
+  padding: 24px 16px 28px;
+  color: var(--ink-50);
+  font-size: 10px;
+  border-top: 1px solid var(--ink-08);
+}
 /* 内嵌模式：由门户滚动容器撑高度，而不是视口 */
 .home.is-embedded { min-height: 100%; }
 
