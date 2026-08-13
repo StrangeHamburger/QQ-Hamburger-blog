@@ -23,7 +23,7 @@ function onSelect(i) { emit('select-layer', i) }
   <div class="formula" :class="{ open }">
     <!-- 卷轴上方的图（未打开时显示，打开后收起；用外框高度过渡，避免 v-if 瞬间高度跳变导致页面抖动） -->
     <div class="scroll-top" :class="{ hide: open }">
-      <img :src="assetsBase + 'scroll-top.png'" alt="" class="scroll-top-img" aria-hidden="true" />
+      <img :src="assetsBase + 'scroll-top.webp'" alt="" class="scroll-top-img" aria-hidden="true" />
     </div>
 
     <!-- 卷轴（点击展开/收起） -->
@@ -44,7 +44,7 @@ function onSelect(i) { emit('select-layer', i) }
 
     <!-- 打开后：从卷轴后方往左冒出的图 -->
     <transition name="pop-left">
-      <img v-if="open" :src="assetsBase + 'scroll-out.png'" alt="" class="scroll-out-img" aria-hidden="true" />
+      <img v-if="open" :src="assetsBase + 'scroll-out.webp'" alt="" class="scroll-out-img" aria-hidden="true" />
     </transition>
 
     <!-- 展开面板：从纸卷里浮现（grid-rows + opacity 平滑过渡） -->

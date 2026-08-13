@@ -188,7 +188,7 @@ function resetEgg() {
     <!-- 凤凰（对话阶段点击推进） -->
     <transition name="fx-slide">
       <div v-if="fxVisible" class="fx-phenix" @click="onPhenixClick" role="button" aria-label="凤凰丁神奶">
-        <img :src="assetsBase + 'fx-' + fxImg + '.png'" alt="" class="fx-img" />
+        <img :src="assetsBase + 'fx-' + fxImg + '.webp'" alt="" class="fx-img" />
       </div>
     </transition>
 

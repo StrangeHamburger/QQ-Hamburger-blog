@@ -12,9 +12,9 @@ onMounted(initGlobalClickSound)
 // 用户滚动到对应区域时图片已在缓存里，秒开
 onMounted(() => {
   const preloadList = [
-    'scroll-out.png', 'soon.png',
-    'fx-1.png', 'fx-2.png', 'fx-3.png', 'fx-4.png',
-    'hobby-sport.jpg', 'hobby-game.jpg'
+    'scroll-out.webp', 'soon.webp',
+    'fx-1.webp', 'fx-2.webp', 'fx-3.webp', 'fx-4.webp',
+    'hobby-sport.webp', 'hobby-game.webp'
   ]
   preloadList.forEach((u) => {
     const img = new Image()
