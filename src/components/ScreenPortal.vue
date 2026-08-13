@@ -72,7 +72,9 @@ onBeforeUnmount(() => {
   opacity: 1;
 }
 
-/* 内嵌站点滚动容器 */
+/* 内嵌站点滚动容器
+ * pointer-events: none：门户是透视投影，Chrome hit-test 失效（滚动偏移未应用），
+ * 指针交互全部由 App.vue 的 .portal-hit overlay 接管（点击转发 + 滚轮转发）。 */
 .portal-scroll {
   position: absolute;
   inset: 0;
@@ -82,5 +84,6 @@ onBeforeUnmount(() => {
   overflow-anchor: none;   /* 禁用滚动锚定：卷轴开合改变内容高度时，防止浏览器自动调整 scrollTop 造成页面上下抖动 */
   background: var(--paper);
   -webkit-overflow-scrolling: touch;
+  pointer-events: none;
 }
 </style>

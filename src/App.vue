@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import MobileHome from './components/MobileHome.vue'
 import KrustyScene from './components/KrustyScene.vue'
 import ScreenPortal from './components/ScreenPortal.vue'
+import { getPortal, portalDeepestAt } from './three/portalRef.js'
 import { initGlobalClickSound } from './utils/sound.js'
 
 // 全局点击音效（深海餐厅主题，按元素自动选音）
@@ -48,6 +49,37 @@ function onArrive() {
 function onLeave() {
   phase.value = 'intro'
 }
+
+// ===== 门户点击/滚轮 overlay =====
+// 门户是透视投影（matrix3d 非仿射变换），Chrome 对它的 hit-test 失效（滚动偏移未应用），
+// elementFromPoint 返回 canvas 而非门户内容。因此用一个无变换的全屏透明层接管指针：
+//   - 点击门户内元素（getBoundingClientRect 手动命中）→ 转发 click 给该元素
+//   - 点击门户外 → 派发 portal-outside-click（场景监听后飞回远观）
+//   - 滚轮 → 转发给 .portal-scroll（保持门户内滚动）
+function onPortalHit(e) {
+  const portal = getPortal()
+  if (!portal) return
+  const target = portalDeepestAt(portal, e.clientX, e.clientY)
+  if (target && target !== portal) {
+    target.dispatchEvent(new MouseEvent('click', {
+      bubbles: true, cancelable: true, view: window,
+      clientX: e.clientX, clientY: e.clientY
+    }))
+  } else {
+    window.dispatchEvent(new CustomEvent('portal-outside-click'))
+  }
+}
+function onPortalWheel(e) {
+  const ps = document.querySelector('.screen-portal .portal-scroll')
+  if (ps) {
+    // 临时关掉 scroll-behavior: smooth——增量滚轮与 smooth 动画互相打断（滚不动/卡顿）
+    const prev = ps.style.scrollBehavior
+    ps.style.scrollBehavior = 'auto'
+    ps.scrollTop += e.deltaY
+    ps.style.scrollBehavior = prev
+    e.preventDefault()
+  }
+}
 </script>
 
 <template>
@@ -58,5 +90,17 @@ function onLeave() {
   <template v-else>
     <KrustyScene :phase="phase" @arrive="onArrive" @leave="onLeave" />
     <ScreenPortal :phase="phase" />
+    <!-- 门户 overlay：接管点击/滚轮（见 onPortalHit/onPortalWheel 注释） -->
+    <div v-if="phase === 'home'" class="portal-hit" @click="onPortalHit" @wheel="onPortalWheel"></div>
   </template>
 </template>
+
+<style>
+/* 门户交互 overlay：全屏透明、无 transform（hit-test 正常），z 高于 portal(1)/场景(0) */
+.portal-hit {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  cursor: default;
+}
+</style>

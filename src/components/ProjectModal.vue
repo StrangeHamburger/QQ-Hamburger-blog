@@ -41,11 +41,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- 全屏详情（meowj 式 case study）；内嵌时投射进笔记本屏幕门户 -->
-  <!-- transition 在 Teleport 内部才能对弹出内容生效（Vue 限制） -->
-  <Teleport :to="embedded ? '.screen-portal' : 'body'">
-    <transition name="pm">
-      <div v-if="visible" class="project-modal" role="dialog" aria-modal="true">
+  <!-- transition 在外层包裹 Teleport（官方推荐结构；transition 放 Teleport 内部会导致
+       切换 v-if 时子组件 vnode 损坏：shouldUpdateComponent 读 emitsOptions 为 null 崩溃） -->
+  <transition name="pm">
+    <Teleport v-if="visible" :to="embedded ? '.screen-portal' : 'body'">
+      <div class="project-modal" role="dialog" aria-modal="true">
         <div class="pm-backdrop" @click="emit('close')"></div>
         <div class="pm-panel">
         <button class="pm-close" @click="emit('close')" aria-label="关闭详情">×</button>
@@ -98,8 +98,8 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-    </transition>
-  </Teleport>
+    </Teleport>
+  </transition>
 </template>
 
 <style scoped>

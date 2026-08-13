@@ -472,8 +472,9 @@ export function createKrustyScene(el, opts = {}) {
 
   function onPointerDown(e) {
     if (mode === 'home') {
-      // 点击页面（门户外）→ 飞回远观场景
-      startReturn()
+      // 点击被门户 overlay（App.vue .portal-hit）接管：portal 内点击转发给内容、
+      // 门外点击派发 portal-outside-click → 下面的事件监听触发 startReturn。
+      // （门户是透视投影，Chrome hit-test 失效，不能在这里用 elementFromPoint）
       return
     }
     if (mode === 'view' || mode === 'viewIdle') {
@@ -498,6 +499,12 @@ export function createKrustyScene(el, opts = {}) {
 
   renderer.domElement.addEventListener('pointermove', onPointerMove)
   renderer.domElement.addEventListener('pointerdown', onPointerDown)
+
+  // 门户 overlay（App.vue .portal-hit）点击门户外 → 飞回远观场景
+  function onPortalOutsideClick() {
+    if (mode === 'home') startReturn()
+  }
+  window.addEventListener('portal-outside-click', onPortalOutsideClick)
 
   function onResize() {
     const w = window.innerWidth
@@ -623,6 +630,7 @@ export function createKrustyScene(el, opts = {}) {
   function dispose() {
     cancelAnimationFrame(raf)
     window.removeEventListener('resize', onResize)
+    window.removeEventListener('portal-outside-click', onPortalOutsideClick)
     renderer.domElement.removeEventListener('pointermove', onPointerMove)
     renderer.domElement.removeEventListener('pointerdown', onPointerDown)
     renderer.domElement.remove()
