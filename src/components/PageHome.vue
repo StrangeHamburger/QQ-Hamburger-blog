@@ -121,7 +121,7 @@ function scrollToBurger() {
 
 /* ---------- 导航 ---------- */
 .nav {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky; top: 0; z-index: 70;   /* 70 > 收银台 60：吸顶时盖住任何滚过它的元素 */
   background: var(--paper);
   border-bottom: 1px solid var(--ink-08);
 }
