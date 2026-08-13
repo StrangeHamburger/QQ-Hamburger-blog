@@ -1094,9 +1094,10 @@ function buildDrink(group) {
     color: 0xdff2ff, roughness: 0.04, metalness: 0,
     transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false
   })
-  const liquidMat = new THREE.MeshStandardMaterial({
-    color: 0x2a1004, roughness: 0.2,
-    transparent: true, opacity: 0.9   // 半透明：能看到内部气泡
+  // 可乐液体（更深的可乐棕，质感更真实）
+  const liquidMat = new THREE.MeshPhysicalMaterial({
+    color: 0x1f0b02, roughness: 0.15, metalness: 0,
+    transparent: true, opacity: 0.92   // 半透明：能看到内部气泡
   })
   const foamMat = new THREE.MeshStandardMaterial({ color: 0xc8a886, roughness: 0.8 })  // 可乐泡沫
   const iceMat = new THREE.MeshStandardMaterial({
@@ -1134,26 +1135,35 @@ function buildDrink(group) {
   straw.position.set(0.15, 0.78, 0)
   straw.rotation.z = -0.32
   group.add(straw)
-  // 可乐气泡细节：液体内部悬浮小气泡 + 液面浮泡
+  // 可乐气泡细节：液体内部悬浮小气泡（小、淡，融进液体）
   const bubbleMat = new THREE.MeshStandardMaterial({
-    color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.75
+    color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.55
   })
   const rand = (a, b) => a + Math.random() * (b - a)
-  for (let i = 0; i < 24; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.006, 0.022), 8, 6), bubbleMat)
+  for (let i = 0; i < 20; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.014), 8, 6), bubbleMat)
     const ang = Math.random() * TAU
     bub.position.set(
-      Math.cos(ang) * rand(0.03, 0.2),
-      rand(0.08, 0.5),
-      Math.sin(ang) * rand(0.03, 0.2)
+      Math.cos(ang) * rand(0.03, 0.19),
+      rand(0.1, 0.48),
+      Math.sin(ang) * rand(0.03, 0.19)
     )
     group.add(bub)
   }
-  // 液面浮泡（大一点，贴着泡沫层）
-  for (let i = 0; i < 7; i++) {
-    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.015, 0.03), 8, 6), bubbleMat)
-    const ang = Math.random() * TAU
-    bub.position.set(Math.cos(ang) * rand(0.02, 0.18), rand(0.55, 0.6), Math.sin(ang) * rand(0.02, 0.18))
+  // 泡沫边缘细粒（取代原来生硬的液面大浮泡）：细密小泡沿杯口一圈错落分布，
+  // 低透明度、大小不一，营造真实可乐泡沫边缘的绵密感
+  const edgeBubbleMat = new THREE.MeshStandardMaterial({
+    color: 0xe8d2b8, roughness: 0.6, transparent: true, opacity: 0.5
+  })
+  for (let i = 0; i < 22; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.013), 8, 6), edgeBubbleMat)
+    const ang = (i / 22) * TAU + rand(-0.08, 0.08)
+    const rr = rand(0.17, 0.24)
+    bub.position.set(
+      Math.cos(ang) * rr,
+      rand(0.552, 0.608),
+      Math.sin(ang) * rr
+    )
     group.add(bub)
   }
 }
