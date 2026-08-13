@@ -523,12 +523,13 @@ export function createKrustyScene(el, opts = {}) {
         b.mesh.position.z = -2.5 - Math.random() * 3.5
       }
     }
-    // 可乐气泡上升：到液面回到底部重新浮起
+    // 可乐气泡上升：接近液面减速（慢慢浮出），到液面顶部后回到底部重新浮起
     const db = drink?.userData?.drinkBubbles
     if (db) {
       for (const bub of db) {
-        bub.position.y += bub.userData.speed * dt
-        if (bub.position.y > 0.5) {
+        const sp = bub.position.y > 0.42 ? bub.userData.speed * 0.25 : bub.userData.speed  // 液面附近减速
+        bub.position.y += sp * dt
+        if (bub.position.y > 0.56) {
           bub.position.y = 0.1
           const ang = Math.random() * TAU
           const rr = 0.03 + Math.random() * 0.16
@@ -1134,6 +1135,20 @@ function buildDrink(group) {
   group.add(liquid)
   // 顶部泡沫层已移除（用户不要液面泡沫），保留内部上升气泡
   const rand = (a, b) => a + Math.random() * (b - a)
+  // 液面贴壁细泡：沿杯壁一圈极小的半透明气泡（像真可乐杯沿的气泡，不起眼但液面不空）
+  const rimMat = new THREE.MeshStandardMaterial({
+    color: 0xe8d2b8, roughness: 0.5, transparent: true, opacity: 0.35
+  })
+  for (let i = 0; i < 14; i++) {
+    const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.003, 0.007), 8, 6), rimMat)
+    const ang = (i / 14) * TAU + rand(-0.1, 0.1)
+    bub.position.set(
+      Math.cos(ang) * rand(0.235, 0.255),
+      rand(0.52, 0.56),
+      Math.sin(ang) * rand(0.235, 0.255)
+    )
+    group.add(bub)
+  }
   // 冰立方
   for (let i = 0; i < 3; i++) {
     const ice = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), iceMat)
