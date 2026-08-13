@@ -96,27 +96,58 @@ export const projects = [
     image: import.meta.env.BASE_URL + 'assets/project-1.jpg',  // 项目封面图
     href: 'https://github.com/StrangeHamburger/QQ-Hamburger-blog',  // 项目链接（GitHub/线上地址）
     detail: {
-      intro: '我的个人网站——从一张白纸开始，和 AI 一起一行一行磨出来的。',
+      intro: '个人网站，把深海餐厅开进了浏览器里。',
       sections: [
         {
           type: 'paras',
-          title: '项目背景',
+          title: '项目简介',
           content: [
-            '2026 年夏天想做自己的个人网站，从零开始。设计参考了 meowj.top，但内容、配色、交互都是自己定的——蟹堡王配色（暖米白/砖红/芥末黄/深海蓝）是我拍板的。',
-            '代码不是纯手写的：大部分由 AI 助手（Hermes / Claude Code）生成，但每一版效果都是我亲自验收、逐条提修改意见打磨出来的——经常一句话不满意就来回改十几轮。',
-            '中途推倒重来过好几次：CSS 入场动画被否、Three.js 海岛开场被否，最后定稿了现在的 3D 深海房间方案。'
+            '2026 年夏天从零搭起来的个人网站。设计参考了一些喜欢的站点，但配色、内容、交互都是自己定的——蟹堡王配色（暖米白 / 砖红 / 芥末黄 / 深海蓝）是反复试出来的。',
+            '开发过程就是不断推翻重来：第一版 CSS 入场动画被自己否掉，Three.js 海岛开场也做过一版，最后才定稿现在的深海房间。每一个细节都是手动调过的。'
           ]
         },
         {
           type: 'list',
-          title: '功能亮点',
+          title: '3D 深海场景',
           content: [
-            '3D 深海房间开场：Three.js 手搓场景，点笔记本把网站投影到屏幕（桌面端）',
-            '6 层写实汉堡纯 CSS：面包/生菜/芝士/肉饼/番茄，hover 联动秘方卷轴',
-            '复古收银机：POWER/PHOTO 按钮 + 故障特效 + 隐藏凤凰彩蛋对话',
-            '手机端直出主页：跳过 3D，移动端布局单独适配',
-            '留言墙接 giscus：评论同步到仓库 Discussions，访客 GitHub 账号登录',
-            'GitHub Pages + 自定义域名 qqhamburger.top 自动部署'
+            'Three.js 手搓的深海房间：暖光吊灯、木桌、漂浮气泡',
+            '桌面端开场：点笔记本相机推近，网站投影到屏幕上',
+            '墙上 4 幅挂画可靠近查看，每幅对应一段音效'
+          ]
+        },
+        {
+          type: 'list',
+          title: '6 层汉堡秘方',
+          content: [
+            '纯 CSS 侧视剖面：高拱芝麻面包 / 波浪生菜 / 滴落芝士 / 焦边肉饼 / 番茄片',
+            '秘方卷轴 hover 条目，汉堡对应层右移放大',
+            '餐盘垫纸、热气、浮动动画'
+          ]
+        },
+        {
+          type: 'list',
+          title: '复古收银机',
+          content: [
+            'POWER 开关屏幕（雪花噪点 + RGB 分离故障特效）',
+            'PHOTO 切换 6 张照片',
+            '隐藏彩蛋：连点屏幕触发凤凰对话，气泡可点击推进'
+          ]
+        },
+        {
+          type: 'list',
+          title: '留言墙',
+          content: [
+            'giscus 驱动，评论同步到仓库 Discussions',
+            '访客用 GitHub 账号登录即可留言，跨设备同步'
+          ]
+        },
+        {
+          type: 'list',
+          title: '响应式与部署',
+          content: [
+            '手机端直出主页（跳过 3D），移动端布局单独适配',
+            'GitHub Actions 自动构建部署',
+            '自定义域名 qqhamburger.top + HTTPS'
           ]
         },
         {
@@ -126,20 +157,10 @@ export const projects = [
         },
         {
           type: 'paras',
-          title: '未来规划',
+          title: '状态与收获',
           content: [
-            '补上博客内容：把踩过的坑和做网站的过程写出来',
-            '继续打磨 3D 场景：加更多可交互的小物件',
-            '给收银机加新的彩蛋'
-          ]
-        },
-        {
-          type: 'paras',
-          title: '过程中的收获',
-          content: [
-            '学会了和 AI 高效协作：需求描述越具体，返工越少；大改之前先出方案',
-            '完整走了一遍 部署 流程：GitHub Actions → Pages → 自定义域名 → DNS → HTTPS 证书，踩了不少坑',
-            '对 Vue 组件拆分、设计令牌（tokens.css）、响应式布局有了实际手感'
+            '已完成，2026 年 8 月上线。',
+            '完整走了一遍 设计 → 开发 → 部署 的流程，对 Vue 组件拆分、设计令牌、响应式布局和 GitHub Pages 部署都摸熟了。'
           ]
         }
       ]
