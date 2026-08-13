@@ -111,7 +111,7 @@ function onSelect(i) { emit('select-layer', i) }
   z-index: 3;
   pointer-events: none;                /* 不拦截鼠标，hover 穿透到卷轴 */
   filter: drop-shadow(0 6px 12px rgba(26, 26, 24, 0.18));
-  transition: height 450ms var(--ease-out), margin-bottom 450ms var(--ease-out), opacity 300ms ease;
+  transition: height 450ms var(--ease-out), margin-bottom 450ms var(--ease-out);  /* 无 opacity 过渡：避免关闭时与 scroll-out 淡出叠加产生虚影 */
 }
 .scroll-top.hide {
   height: 0;
@@ -142,7 +142,7 @@ function onSelect(i) { emit('select-layer', i) }
   transform: translateX(42px) scale(0.9);   /* 从卷轴后方位置冒出 */
 }
 .pop-left-leave-active {
-  transition: opacity 300ms ease, transform 350ms ease;
+  transition: opacity 150ms ease, transform 180ms ease;   /* 快速缩回，减少与 scroll-top 展开的重叠 */
 }
 .pop-left-leave-to {
   opacity: 0;
