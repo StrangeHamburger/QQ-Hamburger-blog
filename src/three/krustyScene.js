@@ -126,10 +126,10 @@ export function createKrustyScene(el, opts = {}) {
   // 四幅挂画（图片纹理，可点击靠近查看；paintings 供射线检测）
   const paintings = []
   const paintingUrls = [
-    import.meta.env.BASE_URL + 'src/assets/painting-1.jpg',   // 从左到右：左墙
-    import.meta.env.BASE_URL + 'src/assets/painting-2.jpg',   // 后墙左
-    import.meta.env.BASE_URL + 'src/assets/painting-3.jpg',   // 后墙右
-    import.meta.env.BASE_URL + 'src/assets/painting-4.jpg'    // 右墙
+    import.meta.env.BASE_URL + 'assets/painting-1.jpg',   // 从左到右：左墙
+    import.meta.env.BASE_URL + 'assets/painting-2.jpg',   // 后墙左
+    import.meta.env.BASE_URL + 'assets/painting-3.jpg',   // 后墙右
+    import.meta.env.BASE_URL + 'assets/painting-4.jpg'    // 右墙
   ]
   const paintFrame = new THREE.MeshStandardMaterial({ color: 0x5a3d22, roughness: 0.6 })
   const addPainting = (x, y, z, s, texIndex) => {

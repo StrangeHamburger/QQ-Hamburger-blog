@@ -1,5 +1,5 @@
 <script setup>
-const assetsBase = import.meta.env.BASE_URL + 'src/assets/'
+const assetsBase = import.meta.env.BASE_URL + 'assets/'
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup>
-const assetsBase = import.meta.env.BASE_URL + 'src/assets/'
+const assetsBase = import.meta.env.BASE_URL + 'assets/'
 
 import { ref } from 'vue'
 import { photos } from '../data/content.js'
