@@ -33,7 +33,11 @@ function onSelectLayer(i) {
   activeId.value = layer.id
   detailOpen.value = true
 }
-function closeDetail() { detailOpen.value = false }
+function closeDetail() {
+  detailOpen.value = false
+  // 先让面板滑出（350ms），动画完成后再卸载内容（避免退出瞬间消失）
+  setTimeout(() => { activeId.value = '' }, 380)
+}
 </script>
 
 <template>
@@ -85,8 +89,8 @@ function closeDetail() { detailOpen.value = false }
     <!-- 详情面板（右侧滑出） -->
     <div class="drawer" :class="{ open: detailOpen }">
       <div class="drawer-backdrop" @click="closeDetail"></div>
-      <div class="drawer-panel" v-if="detailOpen && activeMeta">
-        <div class="drawer-head">
+      <div class="drawer-panel" v-if="detailOpen || activeMeta">
+        <!-- 关闭时 activeMeta 保留 380ms，面板先滑出再卸载 -->        <div class="drawer-head">
           <span class="drawer-num mono-label">{{ activeMeta.num }}</span>
           <span class="drawer-name">{{ activeMeta.name }}</span>
           <span class="drawer-channel mono-label">{{ activeMeta.channel }}</span>

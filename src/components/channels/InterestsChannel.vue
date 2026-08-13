@@ -33,7 +33,7 @@ function toggle(i) {
     </div>
 
     <!-- 展开的目录 -->
-    <transition name="items">
+    <transition name="items" mode="out-in">
       <div v-if="openIndex >= 0" class="hobby-items" :key="openIndex">
         <div
           v-for="(item, k) in interests[openIndex].items"
@@ -158,8 +158,8 @@ function toggle(i) {
 }
 .hobby-item:hover .hi-go { transform: translateX(4px); color: var(--tomato); }
 
-.items-enter-active { animation: items-in 300ms var(--ease-spring); }
-.items-leave-active { animation: items-in 200ms reverse; }
+.items-enter-active { animation: items-in var(--dur) var(--ease-spring); }
+.items-leave-active { animation: items-in 160ms ease-in reverse; }   /* 快速退出，配合 out-in 顺序切换 */
 @keyframes items-in {
   from { opacity: 0; transform: translateY(-10px) scale(0.98); }
 }
