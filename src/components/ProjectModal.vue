@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
+  visible: Boolean,   // 显示控制（父级常驻挂载，内部 transition 接管开关动画）
   title: String,
   subtitle: String,
   meta: String,
@@ -35,10 +36,12 @@ onUnmounted(() => {
 
 <template>
   <!-- 全屏详情（meowj 式 case study）；内嵌时投射进笔记本屏幕门户 -->
+  <!-- transition 在 Teleport 内部才能对弹出内容生效（Vue 限制） -->
   <Teleport :to="embedded ? '.screen-portal' : 'body'">
-    <div class="project-modal" role="dialog" aria-modal="true">
-      <div class="pm-backdrop" @click="emit('close')"></div>
-      <div class="pm-panel">
+    <transition name="pm">
+      <div v-if="visible" class="project-modal" role="dialog" aria-modal="true">
+        <div class="pm-backdrop" @click="emit('close')"></div>
+        <div class="pm-panel">
         <button class="pm-close" @click="emit('close')" aria-label="关闭详情">×</button>
 
         <!-- 头部 -->
@@ -89,10 +92,17 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
+    </transition>
   </Teleport>
 </template>
 
 <style scoped>
+/* 弹层开关过渡（transition 在 Teleport 内部，动画生效） */
+.pm-enter-active { transition: opacity 240ms ease, transform 300ms var(--ease-out); }
+.pm-enter-from { opacity: 0; transform: translateY(10px); }
+.pm-leave-active { transition: opacity 220ms ease, transform 280ms ease-in; }
+.pm-leave-to { opacity: 0; transform: scale(0.97) translateY(14px); }
+
 .project-modal {
   position: fixed; inset: 0;
   z-index: 300;

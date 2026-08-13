@@ -47,15 +47,15 @@ function closeProject() { active.value = null }
       </div>
     </div>
 
-    <!-- 全屏详情弹层（不跳转页面） -->
+    <!-- 全屏详情弹层（不跳转页面；组件常驻，visible 驱动内部 transition 开关动画） -->
     <ProjectModal
-      v-if="active"
+      :visible="!!active"
       :embedded="embedded"
-      :title="active.name"
-      :subtitle="active.desc"
-      :meta="active.tag + ' · ' + active.year"
-      :body="active.detail"
-      :href="active.href"
+      :title="active ? active.name : ''"
+      :subtitle="active ? active.desc : ''"
+      :meta="active ? active.tag + ' · ' + active.year : ''"
+      :body="active ? active.detail : null"
+      :href="active ? active.href : ''"
       @close="closeProject"
     />
   </section>
