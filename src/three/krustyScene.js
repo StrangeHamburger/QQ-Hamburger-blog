@@ -523,6 +523,20 @@ export function createKrustyScene(el, opts = {}) {
         b.mesh.position.z = -2.5 - Math.random() * 3.5
       }
     }
+    // 可乐气泡上升：到液面回到底部重新浮起
+    const db = drink?.userData?.drinkBubbles
+    if (db) {
+      for (const bub of db) {
+        bub.position.y += bub.userData.speed * dt
+        if (bub.position.y > 0.5) {
+          bub.position.y = 0.1
+          const ang = Math.random() * TAU
+          const rr = 0.03 + Math.random() * 0.16
+          bub.position.x = Math.cos(ang) * rr
+          bub.position.z = Math.sin(ang) * rr
+        }
+      }
+    }
   }
 
   function tick() {
@@ -1147,10 +1161,11 @@ function buildDrink(group) {
   straw.position.set(0.15, 0.78, 0)
   straw.rotation.z = -0.32
   group.add(straw)
-  // 可乐气泡细节：液体内部悬浮小气泡（小、淡，融进液体）
+  // 可乐气泡细节：液体内部悬浮小气泡（小、淡，带上升动画）
   const bubbleMat = new THREE.MeshStandardMaterial({
     color: 0xfff8ea, roughness: 0.1, transparent: true, opacity: 0.55
   })
+  const drinkBubbles = []
   for (let i = 0; i < 20; i++) {
     const bub = new THREE.Mesh(new THREE.SphereGeometry(rand(0.004, 0.014), 8, 6), bubbleMat)
     const ang = Math.random() * TAU
@@ -1159,8 +1174,11 @@ function buildDrink(group) {
       rand(0.1, 0.48),
       Math.sin(ang) * rand(0.03, 0.19)
     )
+    bub.userData.speed = rand(0.1, 0.26)   // 上升速度（单位/秒）
     group.add(bub)
+    drinkBubbles.push(bub)
   }
+  group.userData.drinkBubbles = drinkBubbles   // 挂到 group 上，主循环驱动上升
 }
 
 // 方形观景窗：直角矩形框 + 海底玻璃 + 底部窗台（无弧形）
