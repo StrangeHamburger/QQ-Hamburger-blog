@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
   visible: Boolean,   // 显示控制（父级常驻挂载，内部 transition 接管开关动画）
@@ -22,13 +22,19 @@ function portalScrollEl() {
   return document.querySelector('.screen-portal .portal-scroll')
 }
 
+// 弹窗开关时锁/解锁滚动容器（组件常驻挂载，不能用 onMounted 一次性锁死！）
+watch(() => props.visible, (v) => {
+  const el = props.embedded ? portalScrollEl() : document.body
+  if (el) el.style.overflow = v ? 'hidden' : ''
+})
+
 onMounted(() => {
   window.addEventListener('keydown', onKey)
-  const el = props.embedded ? portalScrollEl() : document.body
-  if (el) el.style.overflow = 'hidden'
 })
+
 onUnmounted(() => {
   window.removeEventListener('keydown', onKey)
+  // 兜底：组件卸载时确保解锁
   const el = props.embedded ? portalScrollEl() : document.body
   if (el) el.style.overflow = ''
 })
