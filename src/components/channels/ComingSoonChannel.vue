@@ -1,3 +1,7 @@
+<script setup>
+const assetsBase = import.meta.env.BASE_URL + 'src/assets/'
+</script>
+
 <template>
   <div class="channel soon">
     <div class="soon-card">
@@ -6,7 +10,7 @@
       <p class="soon-desc">这个栏目还在烤炉里……<br />配方正在调试中，随时可能出炉。</p>
       <span class="soon-line mono-label">COMING SOON</span>
       <!-- 右下角装饰图（已抠底） -->
-      <img src="/src/assets/soon.png" alt="" class="soon-img" aria-hidden="true" />
+      :src="assetsBase + 'soon.png'" alt="" class="soon-img" aria-hidden="true" />
     </div>
   </div>
 </template>

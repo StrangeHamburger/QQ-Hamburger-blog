@@ -65,23 +65,23 @@ function noise(ac, t, { dur = 0.15, vol = 0.1, freq = 1000, q = 1, sweep = null 
 
 // 凤凰号角：优先用视频提取的音频样本，未加载时回退合成音
 let hornSample = null
-const hornSampleUrl = '/src/assets/fx-horn.mp3'
+const hornSampleUrl = import.meta.env.BASE_URL + 'src/assets/fx-horn.mp3'
 // 卷轴开/关：视频提取音频样本
 let scrollOpenSample = null
-const scrollOpenSampleUrl = '/src/assets/fx-scroll-open.mp3'
+const scrollOpenSampleUrl = import.meta.env.BASE_URL + 'src/assets/fx-scroll-open.mp3'
 let scrollCloseSample = null
-const scrollCloseSampleUrl = '/src/assets/fx-scroll-close.mp3'
+const scrollCloseSampleUrl = import.meta.env.BASE_URL + 'src/assets/fx-scroll-close.mp3'
 // 靠近/离开笔记本屏幕（3D 场景）：视频提取音频样本
 let approachSample = null
-const approachSampleUrl = '/src/assets/fx-approach.mp3'
+const approachSampleUrl = import.meta.env.BASE_URL + 'src/assets/fx-approach.mp3'
 let leaveSample = null
-const leaveSampleUrl = '/src/assets/fx-leave.mp3'
+const leaveSampleUrl = import.meta.env.BASE_URL + 'src/assets/fx-leave.mp3'
 // 看画音效（进入看画视角后，从左到右依次播放）
 const paintSampleUrls = [
-  '/src/assets/fx-paint-1.mp3',
-  '/src/assets/fx-paint-2.mp3',
-  '/src/assets/fx-paint-3.mp3',
-  '/src/assets/fx-paint-4.mp3'
+  import.meta.env.BASE_URL + 'src/assets/fx-paint-1.mp3',
+  import.meta.env.BASE_URL + 'src/assets/fx-paint-2.mp3',
+  import.meta.env.BASE_URL + 'src/assets/fx-paint-3.mp3',
+  import.meta.env.BASE_URL + 'src/assets/fx-paint-4.mp3'
 ]
 let paintSamples = [null, null, null, null]
 
