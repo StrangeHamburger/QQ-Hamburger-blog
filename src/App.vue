@@ -24,7 +24,8 @@ onMounted(() => {
 })
 
 // 移动端直接显示网站页面，不进入 3D 房间场景（性能 + 交互适配）
-const isMobile = ref(false)
+// 初始值在 setup 阶段同步判断（window 客户端可用），避免首帧误渲染桌面 3D 分支
+const isMobile = ref(window.innerWidth <= 768)
 let mq = null
 function syncIsMobile() {
   isMobile.value = mq ? mq.matches : window.innerWidth <= 768

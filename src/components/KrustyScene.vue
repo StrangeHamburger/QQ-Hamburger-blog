@@ -28,6 +28,8 @@ const bubbles = [
 
 onMounted(async () => {
   const { createKrustyScene } = await import('../three/krustyScene.js')
+  // import 是异步的：期间若 isMobile 变 true（组件被 v-if 卸载），hostRef 已为 null，放弃创建
+  if (!hostRef.value) return
   scene = createKrustyScene(hostRef.value, {
     onArrive: () => emit('arrive'),
     onLeave: () => emit('leave'),

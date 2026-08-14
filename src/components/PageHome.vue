@@ -91,7 +91,7 @@ function scrollToBurger() {
     <ProjectsShowcase :embedded="embedded" />
 
     <!-- ======== 汉堡包秘方（技能墙以下整块） ======== -->
-    <BurgerSection />
+    <BurgerSection :embedded="embedded" />
 
     <!-- ======== 复古收银机（内嵌与全站模式都显示） ======== -->
     <MiniComputer />

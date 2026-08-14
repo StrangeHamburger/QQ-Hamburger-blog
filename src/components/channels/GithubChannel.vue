@@ -3,6 +3,9 @@ import { ref, onMounted } from 'vue'
 import { github as staticGithub } from '../../data/content.js'
 import ProjectModal from '../ProjectModal.vue'
 
+// embedded：被内嵌在门户（ScreenPortal）里时，弹窗投影到门户内而非 body
+defineProps({ embedded: Boolean })
+
 // ============================================================
 // GitHub 栏目 · 运行时自动同步
 // 打开栏目时调用 GitHub API 拉取最新数据（仓库/stars/关注数）
@@ -153,14 +156,15 @@ function closeRepo() { active.value = null }
       <p v-if="!data.repos.length" class="gh-empty mono-label">暂无公开仓库</p>
     </div>
 
-    <!-- 仓库详情弹层 -->
+    <!-- 仓库详情弹层（与 ProjectsShowcase 一致：常驻挂载 + visible 驱动） -->
     <ProjectModal
-      v-if="active"
-      :title="active.name"
-      :subtitle="active.desc"
-      :meta="active.meta"
-      :body="active.detail"
-      :href="active.href"
+      :visible="!!active"
+      :embedded="embedded"
+      :title="active ? active.name : ''"
+      :subtitle="active ? active.desc : ''"
+      :meta="active ? active.meta : ''"
+      :body="active ? active.detail : null"
+      :href="active ? active.href : ''"
       href-label="查看仓库"
       @close="closeRepo"
     />

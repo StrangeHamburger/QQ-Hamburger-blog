@@ -10,6 +10,9 @@ import GuestbookChannel from './channels/GuestbookChannel.vue'
 import BlogChannel from './channels/BlogChannel.vue'
 import ComingSoonChannel from './channels/ComingSoonChannel.vue'
 
+// embedded：门户内嵌模式，透传给 channel 组件（弹窗投影到门户内）
+defineProps({ embedded: Boolean })
+
 const channelMap = {
   github: GithubChannel,
   blog: BlogChannel,
@@ -97,7 +100,7 @@ function closeDetail() {
             <button class="drawer-close" @click="closeDetail" aria-label="关闭">×</button>
           </div>
           <div class="drawer-body">
-            <component :is="activeChannel" v-if="activeChannel" />
+            <component :is="activeChannel" v-if="activeChannel" :embedded="embedded" />
           </div>
         </div>
       </transition>
