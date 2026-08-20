@@ -81,6 +81,16 @@ function onPortalWheel(e) {
     e.preventDefault()
     return
   }
+  // 频道抽屉（汉堡秘方右侧滑出的栏目，如 GitHub）打开时：滚抽屉内容，而不是滚页面
+  const drawerBody = document.querySelector('.drawer.open .drawer-body')
+  if (drawerBody) {
+    const prev = drawerBody.style.scrollBehavior
+    drawerBody.style.scrollBehavior = 'auto'
+    drawerBody.scrollTop += e.deltaY
+    drawerBody.style.scrollBehavior = prev
+    e.preventDefault()
+    return
+  }
   const ps = document.querySelector('.screen-portal .portal-scroll')
   if (ps) {
     // 临时关掉 scroll-behavior: smooth——增量滚轮与 smooth 动画互相打断（滚不动/卡顿）
