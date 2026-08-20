@@ -4,6 +4,11 @@
 
 **QQ Hamburger** 的个人网站 · Vue 3 + Vite + Three.js · 纯手写 CSS · 零 UI 库
 
+[![Vue 3](https://img.shields.io/badge/Vue-3-42b883)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/Vite-6-646cff)](https://vitejs.dev/)
+[![Three.js](https://img.shields.io/badge/Three.js-r160-000000)](https://threejs.org/)
+[![Deploy](https://img.shields.io/badge/Deploy-GitHub%20Actions-2088ff)](.github/workflows/deploy.yml)
+
 🌐 在线访问：[https://qqhamburger.top](https://qqhamburger.top)（备用：[GitHub Pages](https://strangehamburger.github.io/QQ-Hamburger-blog/)）
 
 ---
