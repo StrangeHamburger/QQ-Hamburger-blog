@@ -2,7 +2,7 @@
 
 > 在深海和代码之间，构建有趣的东西。 · 1816414891@qq.com
 
-**QQ Hamburger** 的个人网站 · Vue 3 + Vite + Three.js · 纯手写 CSS · 零 UI 库
+**QQ Hamburger** 的个人网站 · Vue 3 + Vite + Three.js · CSS · 零 UI 库
 
 [![Vue 3](https://img.shields.io/badge/Vue-3-42b883)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-6-646cff)](https://vitejs.dev/)
