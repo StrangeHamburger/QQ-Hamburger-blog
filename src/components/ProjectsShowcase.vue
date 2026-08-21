@@ -14,13 +14,13 @@ function closeProject() { active.value = null }
 <template>
   <section class="works" id="works">
     <div class="container">
-      <div class="works-head">
+      <div class="works-head" v-reveal>
         <h2 class="works-title">项目</h2>
         <span class="works-label mono-label">SELECTED WORKS</span>
       </div>
 
       <!-- 一横排精致小方块 -->
-      <div class="tile-row">
+      <div class="tile-row" v-reveal="{ delay: 120 }">
         <article
           v-for="(proj, i) in projects"
           :key="proj.no"
@@ -104,15 +104,15 @@ function closeProject() { active.value = null }
   transition: box-shadow var(--dur), border-color var(--dur), transform var(--dur);
   overflow: hidden;
 }
-.tile:hover .tile-card { transform: scale(1.04); }
+.tile:hover .tile-card, .tile.is-hover .tile-card { transform: scale(1.04); }
 
-.tone-0 .tile-card { border: 3px solid var(--tomato); box-shadow: 0 4px 0 var(--tomato-soft), 0 10px 22px rgba(224,69,46,0.14); }
-.tone-1 .tile-card { border: 3px solid var(--navy); box-shadow: 0 4px 0 rgba(36,66,94,0.18), 0 10px 22px rgba(36,66,94,0.14); }
-.tone-2 .tile-card { border: 3px solid var(--mustard); box-shadow: 0 4px 0 var(--mustard-soft), 0 10px 22px rgba(242,184,75,0.16); }
+.tone-0 .tile-card { border: 3px solid var(--tomato); box-shadow: 4px 4px 0 var(--tomato-soft), 0 10px 22px rgba(224,69,46,0.12); }
+.tone-1 .tile-card { border: 3px solid var(--navy); box-shadow: 4px 4px 0 rgba(36,66,94,0.18), 0 10px 22px rgba(36,66,94,0.14); }
+.tone-2 .tile-card { border: 3px solid var(--mustard); box-shadow: 4px 4px 0 var(--mustard-soft), 0 10px 22px rgba(242,184,75,0.14); }
 
-.tile:hover .tone-0 .tile-card { box-shadow: 0 6px 0 var(--tomato-soft), 0 16px 30px rgba(224,69,46,0.2); }
-.tile:hover .tone-1 .tile-card { box-shadow: 0 6px 0 rgba(36,66,94,0.18), 0 16px 30px rgba(36,66,94,0.2); }
-.tile:hover .tone-2 .tile-card { box-shadow: 0 6px 0 var(--mustard-soft), 0 16px 30px rgba(242,184,75,0.22); }
+.tile:hover .tone-0 .tile-card, .tile.is-hover .tone-0 .tile-card { box-shadow: 6px 6px 0 var(--tomato-soft), 0 16px 30px rgba(224,69,46,0.2); }
+.tile:hover .tone-1 .tile-card, .tile.is-hover .tone-1 .tile-card { box-shadow: 6px 6px 0 rgba(36,66,94,0.2), 0 16px 30px rgba(36,66,94,0.2); }
+.tile:hover .tone-2 .tile-card, .tile.is-hover .tone-2 .tile-card { box-shadow: 6px 6px 0 var(--mustard-soft), 0 16px 30px rgba(242,184,75,0.22); }
 
 .tile-img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -127,7 +127,7 @@ function closeProject() { active.value = null }
 .tone-0 .tile-no { color: var(--tomato); }
 .tone-1 .tile-no { color: var(--navy); }
 .tone-2 .tile-no { color: #b8860b; }
-.tile:hover .tile-no { transform: scale(1.12); }
+.tile:hover .tile-no, .tile.is-hover .tile-no { transform: scale(1.12); }
 
 /* 装饰：角落圆点 + 十字 */
 .tile-dot {

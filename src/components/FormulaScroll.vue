@@ -100,7 +100,7 @@ function onSelect(i) { emit('select-layer', i) }
   position: relative;
   z-index: 2;
 }
-.formula-scroll:hover { transform: scale(1.03); }
+.formula-scroll:hover, .formula-scroll.is-hover { transform: scale(1.03); }
 
 /* 卷轴上方的图（未打开时显示；外框高度过渡，收起时裁剪图片不被压扁） */
 .scroll-top {

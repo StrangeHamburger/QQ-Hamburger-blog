@@ -26,6 +26,16 @@ const activeId = ref('')
 const activeLayer = ref(-1)
 const detailOpen = ref(false)
 
+// 汉堡随鼠标轻微 3D 倾斜（iso-stage 上 mousemove → rotateX/rotateY）
+const tilt = ref({ x: 0, y: 0 })
+function onTilt(e) {
+  const r = e.currentTarget.getBoundingClientRect()
+  const px = (e.clientX - r.left) / r.width - 0.5
+  const py = (e.clientY - r.top) / r.height - 0.5
+  tilt.value = { x: py * -7, y: px * 9 }
+}
+function resetTilt() { tilt.value = { x: 0, y: 0 } }
+
 const activeChannel = computed(() => (activeId.value ? channelMap[activeId.value] : null))
 const activeMeta = computed(() => burgerLayers.find(l => l.id === activeId.value))
 
@@ -70,21 +80,21 @@ function closeDetail() {
       </svg>
     </div>
 
-    <div class="container">
+    <div class="container" v-reveal>
       <span class="section-eyebrow mono-label">SECRET FORMULA</span>
       <h2 class="section-title">汉堡包秘方</h2>
       <p class="section-sub">六层秘方 · 从上到下，每一层都是一个栏目的入口</p>
     </div>
 
-    <div class="burger-wrap container">
+    <div class="burger-wrap container" v-reveal="{ delay: 120 }">
       <!-- 左：秘方卷轴 -->
       <FormulaScroll
         @hover-layer="onHoverLayer"
         @select-layer="onSelectLayer"
       />
       <!-- 右：2.5D 汉堡 -->
-      <div class="iso-stage">
-        <Burger25D :active-layer="activeLayer" />
+      <div class="iso-stage" @mousemove="onTilt" @mouseleave="resetTilt">
+        <Burger25D :active-layer="activeLayer" :tilt="tilt" />
       </div>
     </div>
 

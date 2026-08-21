@@ -1,10 +1,16 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { burgerLayers } from '../data/content.js'
 
 const props = defineProps({
-  activeLayer: { type: Number, default: -1 }
+  activeLayer: { type: Number, default: -1 },
+  tilt: { type: Object, default: () => ({ x: 0, y: 0 }) }
 })
+
+// 鼠标倾斜：把 tilt 角度转成 3D 透视变换
+const tiltStyle = computed(
+  () => `perspective(900px) rotateX(${props.tilt.x}deg) rotateY(${props.tilt.y}deg)`
+)
 
 // 写实汉堡 v2：更逼真形状 + 层间缝隙
 // 尺寸（宽 / 高）
@@ -16,7 +22,8 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
 </script>
 
 <template>
-  <div class="real-burger" aria-label="汉堡剖面">
+  <div class="rb-tilt" :style="tiltStyle">
+    <div class="real-burger" aria-label="汉堡剖面">
     <!-- 餐盘垫纸 -->
     <div class="rb-plate" aria-hidden="true"></div>
     <!-- 左右装饰 -->
@@ -45,10 +52,18 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
       <!-- 层间分隔阴影（厚度感） -->
       <div class="rb-edge" aria-hidden="true"></div>
     </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
+/* 倾斜外壳：鼠标跟随的 3D 透视，独立于浮动的 .real-burger */
+.rb-tilt {
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms var(--ease-out);
+  transform-style: preserve-3d;
+}
 .real-burger {
   position: relative;
   width: 100%;

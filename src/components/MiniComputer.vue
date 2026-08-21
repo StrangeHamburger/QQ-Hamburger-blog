@@ -415,7 +415,8 @@ import { computed } from 'vue'
   background: linear-gradient(180deg, #4a7ab0, var(--navy));
   box-shadow: 0 3px 0 rgba(15, 30, 50, 0.45);
 }
-.btn-red:hover, .btn-blue:hover { transform: translateY(-2px); filter: brightness(1.08); }
+.btn-red:hover, .btn-blue:hover,
+.btn-red.is-hover, .btn-blue.is-hover { transform: translateY(-2px); filter: brightness(1.08); }
 .btn-red:active, .btn-blue:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,0.3); }
 .btn-red:disabled, .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
 

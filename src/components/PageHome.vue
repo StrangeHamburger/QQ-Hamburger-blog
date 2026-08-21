@@ -59,7 +59,7 @@ function scrollToBurger() {
         </svg>
       </div>
 
-      <div class="container hero-inner">
+      <div class="container hero-inner" v-reveal>
         <div class="hero-name-block" @click="onNameClick">
           <h1 class="hero-name" :class="{ stamped: nameClicked }">{{ profile.name }}</h1>
           <span class="hero-stamp mono-label">{{ profile.stamp }}</span>
@@ -74,7 +74,7 @@ function scrollToBurger() {
 
         <!-- 按钮 -->
         <div class="hero-actions">
-          <button class="btn btn-primary" @click="scrollToBurger">查看汉堡秘方 ↓</button>
+          <button class="btn btn-primary" v-magnetic @click="scrollToBurger">查看汉堡秘方 ↓</button>
           <a class="btn btn-ghost" href="#works">看看项目</a>
         </div>
       </div>
@@ -260,18 +260,19 @@ function scrollToBurger() {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 12px 24px; border-radius: var(--radius-sm);
   font-size: 15px; font-weight: 600;
-  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast), background var(--dur-fast);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out), background var(--dur-fast);
 }
 .btn-primary {
   background: var(--tomato); color: var(--cream);
-  box-shadow: 0 3px 0 var(--navy-deep);
+  box-shadow: 4px 4px 0 var(--navy-deep);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--navy-deep); }
+.btn-primary:hover, .btn-primary.is-hover { box-shadow: 6px 6px 0 var(--navy-deep); }
 .btn-ghost {
   background: var(--cream); color: var(--ink);
   border: 1.5px solid var(--ink-30);
+  box-shadow: 3px 3px 0 var(--ink-12);
 }
-.btn-ghost:hover { transform: translateY(-2px); border-color: var(--tomato); color: var(--tomato); }
+.btn-ghost:hover, .btn-ghost.is-hover { transform: translate(-2px, -2px); border-color: var(--tomato); color: var(--tomato); box-shadow: 5px 5px 0 var(--ink-12); }
 
 /* ---------- 响应式 ---------- */
 @media (min-width: 768px) {

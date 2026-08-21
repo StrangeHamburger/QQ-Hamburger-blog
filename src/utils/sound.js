@@ -153,6 +153,9 @@ const SOUNDS = {
   // 默认：轻咔哒
   click: (ac, t) => tone(ac, t, { freq: 950, end: 480, dur: 0.07, vol: 0.09 }),
 
+  // 悬停：极轻的上滑气泡声（音量刻意压低，不打扰）
+  hover: (ac, t) => tone(ac, t, { freq: 520, end: 880, dur: 0.06, vol: 0.028, type: 'sine' }),
+
   // 收银机按钮：金属"叮"（高频双音 + 尾音）
   cash: (ac, t) => {
     tone(ac, t, { freq: 2093, end: 1800, dur: 0.16, vol: 0.08, type: 'sine' })
@@ -287,4 +290,28 @@ export function initGlobalClickSound() {
     const kind = soundFor(el)
     if (kind) playSound(kind)
   }, true)   // 捕获阶段：确保先于组件内其他逻辑
+}
+
+// ---- 全局悬停音效：鼠标移入交互元素时轻响（桌面端门户内由 overlay 转发 mouseover 触发） ----
+let hoverInited = false
+let lastHoverEl = null
+let lastHoverAt = 0
+
+export function initGlobalHoverSound() {
+  if (hoverInited) return
+  hoverInited = true
+  // 只在有 hover 能力的设备上注册（触屏没有悬停）
+  if (!window.matchMedia('(hover: hover)').matches) return
+  document.addEventListener('mouseover', (e) => {
+    const t = e.target
+    if (!t || typeof t.closest !== 'function') return
+    const el = t.closest('button, a, [role="button"], .formula-item, .tile, .proj-card')
+    if (!el) { lastHoverEl = null; return }
+    if (el === lastHoverEl) return
+    lastHoverEl = el
+    const now = performance.now()
+    if (now - lastHoverAt < 90) return   // 快速扫过时克制，避免连响
+    lastHoverAt = now
+    playSound('hover')
+  }, true)
 }

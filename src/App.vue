@@ -4,10 +4,12 @@ import MobileHome from './components/MobileHome.vue'
 import KrustyScene from './components/KrustyScene.vue'
 import ScreenPortal from './components/ScreenPortal.vue'
 import { getPortal, portalDeepestAt } from './three/portalRef.js'
-import { initGlobalClickSound } from './utils/sound.js'
+import { initGlobalClickSound, initGlobalHoverSound } from './utils/sound.js'
 
 // 全局点击音效（深海餐厅主题，按元素自动选音）
 onMounted(initGlobalClickSound)
+// 全局悬停音效（hover 时轻响）
+onMounted(initGlobalHoverSound)
 
 // 图片预加载：页面加载完成即提前拉取未挂载 DOM 的图片（敬请期待/彩蛋/卷轴冒图等），
 // 用户滚动到对应区域时图片已在缓存里，秒开
@@ -49,6 +51,7 @@ function onArrive() {
 
 function onLeave() {
   phase.value = 'intro'
+  clearPortalHover()
 }
 
 // ===== 门户点击/滚轮 overlay =====
@@ -101,6 +104,45 @@ function onPortalWheel(e) {
     e.preventDefault()
   }
 }
+
+// ===== 门户 hover 转发 =====
+// 门户内容 pointer-events:none（矩阵投影 hit-test 失效），导致悬停（:hover / mouseenter）
+// 全部失效。这里在 overlay 的 mousemove 里手动命中、把 mouseenter/mouseleave 派发给
+// 目标交互元素，让「卷轴栏目悬停 → 汉堡位移」「悬停音效」「悬停动画」在桌面门户内也能用。
+const INTERACTIVE_SEL = 'button, a, [role="button"], .formula-item, .tile, .proj-card'
+let hoverEl = null
+let hoverRaf = 0
+function onPortalMove(e) {
+  const x = e.clientX
+  const y = e.clientY
+  if (hoverRaf) return
+  hoverRaf = requestAnimationFrame(() => {
+    hoverRaf = 0
+    const portal = getPortal()
+    if (!portal) return
+    const target = portalDeepestAt(portal, x, y)
+    const el = target && target !== portal ? target.closest(INTERACTIVE_SEL) : null
+    if (el === hoverEl) return
+    if (hoverEl) {
+      hoverEl.classList.remove('is-hover')
+      hoverEl.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+      hoverEl.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+    }
+    hoverEl = el
+    if (el) {
+      el.classList.add('is-hover')
+      el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
+      el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+    }
+  })
+}
+function clearPortalHover() {
+  if (hoverEl) {
+    hoverEl.classList.remove('is-hover')
+    hoverEl.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+    hoverEl = null
+  }
+}
 </script>
 
 <template>
@@ -111,8 +153,8 @@ function onPortalWheel(e) {
   <template v-else>
     <KrustyScene :phase="phase" @arrive="onArrive" @leave="onLeave" />
     <ScreenPortal :phase="phase" />
-    <!-- 门户 overlay：接管点击/滚轮（见 onPortalHit/onPortalWheel 注释） -->
-    <div v-if="phase === 'home'" class="portal-hit" @click="onPortalHit" @wheel="onPortalWheel"></div>
+    <!-- 门户 overlay：接管点击/滚轮/悬停（见 onPortalHit/onPortalWheel/onPortalMove 注释） -->
+    <div v-if="phase === 'home'" class="portal-hit" @click="onPortalHit" @wheel="onPortalWheel" @mousemove="onPortalMove"></div>
   </template>
 </template>
 

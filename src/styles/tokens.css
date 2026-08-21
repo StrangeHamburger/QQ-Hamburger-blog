@@ -8,14 +8,16 @@
   --ink: #1a1a18;          /* 主文字：暖黑 */
   --ink-70: rgba(26, 26, 24, 0.7);
   --ink-50: rgba(26, 26, 24, 0.5);
+  --ink-40: rgba(26, 26, 24, 0.4);
   --ink-30: rgba(26, 26, 24, 0.3);
+  --ink-20: rgba(26, 26, 24, 0.2);
   --ink-12: rgba(26, 26, 24, 0.12);
   --ink-08: rgba(26, 26, 24, 0.08);
   --tomato: #e0452e;       /* 强调：砖红 */
   --tomato-soft: rgba(224, 69, 46, 0.14);
   --mustard: #f2b84b;      /* 点缀：芥末黄 */
   --mustard-soft: rgba(242, 184, 75, 0.2);
-  --navy: #24425e;         /* 深色块：深海蓝 */
+  --navy: #24425e;         /* 深色块：深海蓝（海底主题，别压成纯黑） */
   --navy-deep: #1a3048;
   --cream: #fffdf8;        /* 卡片：奶油白 */
   --cream-shade: #f1ebe0;  /* 阴影面 */
@@ -55,10 +57,14 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);          /* easeOutExpo：快起慢落，丝滑 */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* 过冲回弹：保留 */
 
-  /* 阴影（双色投影，质感来源） */
-  --shadow-card: 0 2px 0 var(--ink-12), 0 8px 24px rgba(26, 26, 24, 0.06);
-  --shadow-pop: 0 4px 0 var(--ink-12), 0 14px 34px rgba(26, 26, 24, 0.12);
-  --shadow-tomato: 3px 3px 0 var(--tomato-soft);
+  /* 阴影（统一印刷硬投影：硬边错位色块 + 一层柔光，全局一致才有质感） */
+  --shadow-xs: 0 1px 0 var(--ink-12);
+  --shadow-sm: 0 2px 0 var(--ink-12);
+  --shadow-card: 3px 3px 0 var(--ink-12), 0 12px 28px rgba(26, 26, 24, 0.07);
+  --shadow-pop: 4px 4px 0 var(--ink-12), 0 18px 40px rgba(26, 26, 24, 0.14);
+  --shadow-hard: 4px 4px 0 var(--ink);            /* 强调硬投影：墨黑错位 */
+  --shadow-tomato: 4px 4px 0 var(--tomato);       /* 红色错位 */
+  --shadow-float: 0 22px 48px rgba(26, 26, 24, 0.16); /* 浮层（抽屉/弹窗）柔光 */
 
   /* 内容宽度 */
   --content-max: 1160px;
