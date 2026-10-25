@@ -128,17 +128,18 @@ function submit() {
       ], 520)
       // 像素蟹黄堡：逐行弹出，按层上色。
       // 每行 = 前导空格 + 等宽块字符，(30 - 宽度) / 2 居中，保证层层对齐
+      // art 类：禁止换行拆行（窄屏也不把画拆碎）
       const art = [
-        ['        ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-bun'],
-        ['    ██████████████████████', 'c-bun'],
-        ['  ██████████████████████████', 'c-bun'],
-        [' ▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒', 'c-lettuce'],
-        ['  ██████████████████████████', 'c-cheese'],
-        [' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒', 'c-patty'],
-        ['    ██████████████████████', 'c-tomato-line'],
-        ['  ██████████████████████████', 'c-bun'],
-        ['      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀', 'c-bun'],
-        ['▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-plate']
+        ['        ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-bun art'],
+        ['    ██████████████████████', 'c-bun art'],
+        ['  ██████████████████████████', 'c-bun art'],
+        [' ▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒', 'c-lettuce art'],
+        ['  ██████████████████████████', 'c-cheese art'],
+        [' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒', 'c-patty art'],
+        ['    ██████████████████████', 'c-tomato-line art'],
+        ['  ██████████████████████████', 'c-bun art'],
+        ['      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀', 'c-bun art'],
+        ['▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-plate art']
       ]
       art.forEach((l, i) => setTimeout(() => print(l[0], l[1]), 1900 + i * 130))
       setTimeout(() => print('✅ 蟹黄堡完成！好看又好吃。', 'warn'), 1900 + art.length * 130 + 250)
@@ -274,6 +275,8 @@ onBeforeUnmount(() => {
 .dt-line.cmd { color: #d8ffe4; }
 .dt-line.warn { color: #ffd27d; text-shadow: 0 0 6px rgba(255, 200, 100, 0.4); }
 .dt-line.dim { opacity: 0.6; }
+/* 像素画行：禁止拆行，保持块字符对齐 */
+.dt-line.art { white-space: pre; word-break: normal; }
 /* 像素蟹黄堡：按层上色 */
 .dt-line.c-bun { color: #ffd27d; text-shadow: 0 0 5px rgba(255, 210, 125, 0.35); }
 .dt-line.c-lettuce { color: #8fd974; text-shadow: 0 0 5px rgba(143, 217, 116, 0.35); }
@@ -300,4 +303,10 @@ onBeforeUnmount(() => {
 .term-enter-from { opacity: 0; transform: scale(0.97) translateY(8px); }
 .term-leave-active { transition: opacity 160ms ease; }
 .term-leave-to { opacity: 0; }
+/* ======== 窄屏适配 ======== */
+@media (max-width: 767px) {
+  .dt-body { font-size: 11px; padding: 12px 12px 14px; }   /* 像素画 30+ 列完整放下 */
+  .dt-input { font-size: 11.5px; }
+  .is-close { width: 32px; height: 32px; font-size: 22px; }
+}
 </style>

@@ -356,7 +356,7 @@ function onTitleClick(e) {
 
 @media (max-width: 767px) {
   .burger-wrap { flex-direction: column; gap: 20px; }
-  .iso-stage { flex: 0 0 280px; height: 300px; }
+  .iso-stage { flex: 0 0 280px; height: 380px; }   /* 加高：给食材来源气泡留出面包上方的空间 */
   /* 88vw：右侧留出一条背板空白，点空白即可关闭（100vw 时只能点 ×，太麻烦） */
   .drawer-panel { width: 88vw; }
 }

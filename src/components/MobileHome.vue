@@ -40,6 +40,13 @@ import PageHome from './PageHome.vue'
   display: none;
 }
 
+/* 食材来源气泡：面包顶正上方（舞台 380 高，面包顶在 244px 处），不遮挡汉堡 */
+:deep(.ingredient-tip) {
+  right: -8px;
+  bottom: 252px;
+  width: 196px;
+}
+
 /* 小鱼群：手机端 hero 布局不同，挪到按钮右侧空白区（原左下会被裁切） */
 :deep(.hero-fish) {
   left: auto;
