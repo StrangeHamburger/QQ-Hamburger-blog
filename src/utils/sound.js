@@ -264,6 +264,7 @@ function soundFor(el) {
   if (!cls) return null
   if (cls.includes('btn-red') || cls.includes('btn-blue')) return 'cash'
   if (cls.includes('mc-screen')) return 'beep'
+  if (cls.includes('rb-layer')) return 'bubble'
   if (cls.includes('formula-scroll')) {
     // 展开=纸卷声，收起=卷轴关闭声（看父容器是否 open）
     return el.parentElement && el.parentElement.classList.contains('open') ? 'scroll-close' : 'scroll-open'

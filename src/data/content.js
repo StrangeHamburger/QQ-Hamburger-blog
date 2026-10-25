@@ -28,32 +28,35 @@ export const skills = [
   'Docker', 'Git', 'MySQL', 'Rust', 'Three.js', 'Linux'
 ]
 
-// 技能分组（分组卡片用）
+// 技能分组（分组卡片用）——level 是实在的熟练度标签，自信但不吹
 export const skillGroups = [
   {
     group: 'FRONTEND · 前端',
     icon: '◈',
-    desc: '喜欢把界面做得又好看又能跑，最近沉迷动效。',
+    level: '主战场',
+    desc: '界面好看又能跑是我的追求，CSS 动效和 3D 场景都在这个网站里用上了。',
     items: ['Vue 3', 'TypeScript', 'CSS 动效', 'Three.js']
   },
   {
     group: 'BACKEND · 后端',
     icon: '▣',
-    desc: '写 API 像做汉堡：配料清楚、层次分明。',
+    level: '持续补课',
+    desc: '能写出跑得起来的接口。像做汉堡：一层一层，认真堆好。',
     items: ['Node.js', 'Python', 'MySQL', 'Rust']
   },
   {
     group: 'TOOLS · 工具',
     icon: '⚒',
-    desc: '工欲善其事，这些是我的老伙计。',
+    level: '日常顺手',
+    desc: '工欲善其事，这几件是我的老伙计。',
     items: ['Docker', 'Git', 'Linux', 'VS Code']
   }
 ]
 
 export const about = {
   paragraphs: [
-    '你好，我是 QQ Hamburger，25届计算机科学与技术专业学生。喜欢把复杂的问题拆成有趣的零件，再组装成能跑的东西。',
-    '空闲时间在 GitHub 上写开源，在深海餐厅里研究汉堡配方，偶尔也修修企鹅的电脑。'
+    '你好，我是 QQ Hamburger，25 届计算机科学与技术专业。喜欢把想法做成能跑的东西——你现在看到的这个网站，从设计、动效到部署，就是我独立完成的。',
+    '前端是我的主场，后端和工具链在持续补课。做汉堡和写代码是一个道理：一层一层，认真堆好。'
   ],
   signature: 'Q.H.',
   photo: null  // TODO: 放个人照片路径（如 /src/assets/me.webp）
@@ -67,14 +70,21 @@ export const timeline = [
   { year: '2026', title: '毕业设计', desc: '深海餐厅管理系统' }
 ]
 
-// ---- 汉堡 6 层（对应 6 个栏目） ----
+// ---- 汉堡 6 层（对应 6 个栏目）+ 每层的食材来源彩蛋 ----
+// name = 栏目名（卷轴/抽屉用）；ingredient + source = 点击汉堡层的食材来源彩蛋
 export const burgerLayers = [
-  { id: 'github',    num: '01', name: 'GitHub',       channel: 'GITHUB',      color: '#f2b84b', shape: 'bun-top' },
-  { id: 'blog',      num: '02', name: '博客',         channel: 'BLOG',         color: '#f1ebe0', shape: 'lettuce' },
-  { id: 'resume',    num: '03', name: '简历',         channel: 'RESUME',       color: '#e0452e', shape: 'cheese' },
-  { id: 'interests', num: '04', name: '兴趣爱好',     channel: 'INTERESTS',    color: '#1a3048', shape: 'patty' },
-  { id: 'guestbook', num: '05', name: '留言',         channel: 'GUESTBOOK',    color: '#24425e', shape: 'tomato' },
-  { id: 'soon',      num: '06', name: '敬请期待',     channel: 'COMING SOON',  color: '#f2b84b', shape: 'bun-bottom' }
+  { id: 'github',    num: '01', name: 'GitHub',   channel: 'GITHUB',      color: '#f2b84b', shape: 'bun-top',
+    ingredient: '顶层面包', source: '深海麦田现烤，每天清晨 5 点由海绵宝宝新鲜送达。' },
+  { id: 'blog',      num: '02', name: '博客',     channel: 'BLOG',         color: '#f1ebe0', shape: 'lettuce',
+    ingredient: '脆脆生菜', source: '比奇堡有机农场直供，蟹老板为了批发价砍了三小时。' },
+  { id: 'resume',    num: '03', name: '简历',     channel: 'RESUME',       color: '#e0452e', shape: 'cheese',
+    ingredient: '浓香芝士', source: '章鱼哥擦了三年的芝士轮，成熟度刚刚好。' },
+  { id: 'interests', num: '04', name: '兴趣爱好', channel: 'INTERESTS',    color: '#1a3048', shape: 'patty',
+    ingredient: '秘制肉饼', source: '成分保密——痞老板偷了 17 年都没得手。' },
+  { id: 'guestbook', num: '05', name: '留言',     channel: 'GUESTBOOK',    color: '#24425e', shape: 'tomato',
+    ingredient: '沙甜番茄', source: '珊瑚礁日光温室现摘，沙甜多汁还会脸红。' },
+  { id: 'soon',      num: '06', name: '敬请期待', channel: 'COMING SOON',  color: '#f2b84b', shape: 'bun-bottom',
+    ingredient: '底层面包', source: '和顶层面包是一对，从小一起长大的。' }
 ]
 
 // 博客文章（博客栏目用）

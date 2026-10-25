@@ -1,11 +1,12 @@
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import { burgerLayers } from '../data/content.js'
 
 const props = defineProps({
-  activeLayer: { type: Number, default: -1 },
+  activeLayer: { type: Number, default: -1 },   // B：卷轴条目悬停联动（右移+放大）
   tilt: { type: Object, default: () => ({ x: 0, y: 0 }) }
 })
+const emit = defineEmits(['layer-click'])
 
 // 鼠标倾斜：把 tilt 角度转成 3D 透视变换
 const tiltStyle = computed(
@@ -16,9 +17,6 @@ const tiltStyle = computed(
 // 尺寸（宽 / 高）
 const LAYER_W = [268, 244, 228, 252, 220, 268]
 const LAYER_H = [62, 26, 16, 38, 16, 36]
-
-const selected = ref(-1)
-watch(() => props.activeLayer, (v) => { selected.value = v })
 </script>
 
 <template>
@@ -40,13 +38,19 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
     <!-- 地面投影 -->
     <div class="rb-shadow" aria-hidden="true"></div>
 
-    <!-- 层（顶→底） -->
+    <!-- 层（顶→底）：A 悬停只放大；B 卷轴悬停右移+放大；点击 = 转到食材固定场景 -->
     <div
       v-for="(layer, i) in burgerLayers"
       :key="layer.id"
       class="rb-layer"
-      :class="['layer--' + layer.shape, { selected: selected === i }]"
-      :style="{ '--w': LAYER_W[i] + 'px', '--h': LAYER_H[i] + 'px', zIndex: selected === i ? 20 : 10 - i }"
+      :class="[
+        'layer--' + layer.shape,
+        { selected: props.activeLayer === i, hovered: hoverIdx === i }
+      ]"
+      :style="{ '--w': LAYER_W[i] + 'px', '--h': LAYER_H[i] + 'px', zIndex: props.activeLayer === i ? 20 : 10 - i }"
+      role="button"
+      :aria-label="'查看' + layer.ingredient + '的来源'"
+      @click.stop="emit('layer-click', i, $event)"
     >
       <div class="rb-inner"></div>
       <!-- 层间分隔阴影（厚度感） -->
@@ -176,6 +180,7 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
   width: var(--w);
   height: var(--h);
   margin: 2px 0;  /* 层间缝隙 */
+  cursor: pointer;   /* 可点击：打开对应栏目 */
   transition: transform 260ms var(--ease-spring);
   filter: drop-shadow(0 2px 2px rgba(26,26,24,0.1));
 }
@@ -185,11 +190,17 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
   width: 100%; height: 100%;
 }
 
-/* 选中：向右滑出（无边框） */
+/* B：卷轴联动 — 右移+放大 */
 .rb-layer.selected {
   transform: translateX(46px) scale(1.06);
   filter: drop-shadow(0 4px 10px rgba(224,69,46,0.25));
   z-index: 30;
+}
+/* A：直接悬停 — 只放大（门户 overlay 用 .is-hover 驱动） */
+.rb-layer.is-hover {
+  transform: scale(1.09);
+  filter: drop-shadow(0 5px 9px rgba(224,69,46,0.22));
+  z-index: 25;
 }
 
 /* ======== 顶面包：高拱 + 芝麻 + 皮层质感 ======== */

@@ -7,6 +7,12 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    strictPort: false
+    strictPort: false,
+    watch: {
+      // Windows 下系统文件通知偶发丢失导致监听僵死（改动不生效），
+      // 改用轮询：稳定可靠，代价是少量后台 CPU
+      usePolling: true,
+      interval: 300
+    }
   }
 })

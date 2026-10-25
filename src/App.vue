@@ -6,6 +6,7 @@ import ScreenPortal from './components/ScreenPortal.vue'
 import { getPortal, portalDeepestAt } from './three/portalRef.js'
 import { initGlobalClickSound, initGlobalHoverSound } from './utils/sound.js'
 import { initGlobalBubbles } from './utils/bubbles.js'
+import { initKonami } from './utils/konami.js'
 
 // 全局点击音效（深海餐厅主题，按元素自动选音）
 onMounted(initGlobalClickSound)
@@ -13,6 +14,16 @@ onMounted(initGlobalClickSound)
 onMounted(initGlobalHoverSound)
 // 全局点击气泡（下潜世界触感）
 onMounted(initGlobalBubbles)
+// Konami 秘技 → 蟹黄堡雨
+onMounted(initKonami)
+
+// 标签页彩蛋：切走时标题求助，回来恢复
+const ORIGIN_TITLE = document.title
+function onVisibilityChange() {
+  document.title = document.hidden ? '别走…蟹堡王需要你' : ORIGIN_TITLE
+}
+onMounted(() => document.addEventListener('visibilitychange', onVisibilityChange))
+onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisibilityChange))
 
 // 图片预加载：页面加载完成即提前拉取未挂载 DOM 的图片（敬请期待/彩蛋/卷轴冒图等），
 // 用户滚动到对应区域时图片已在缓存里，秒开
@@ -140,7 +151,7 @@ function onPortalWheel(e) {
 // 门户内容 pointer-events:none（矩阵投影 hit-test 失效），导致悬停（:hover / mouseenter）
 // 全部失效。这里在 overlay 的 mousemove 里手动命中、把 mouseenter/mouseleave 派发给
 // 目标交互元素，让「卷轴栏目悬停 → 汉堡位移」「悬停音效」「悬停动画」在桌面门户内也能用。
-const INTERACTIVE_SEL = 'button, a, [role="button"], .formula-item, .tile, .proj-card'
+const INTERACTIVE_SEL = 'button, a, [role="button"], .formula-item, .tile, .proj-card, .rb-layer, .skill-card, .file-card'
 let hoverEl = null
 let hoverRaf = 0
 function onPortalMove(e) {

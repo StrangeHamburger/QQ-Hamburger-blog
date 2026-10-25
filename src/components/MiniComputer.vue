@@ -434,7 +434,7 @@ import { computed } from 'vue'
    落点在收银机右下：两栏 hero（右栏）与窄屏堆叠（容器左侧）都放得下，不会越出视口 */
 .fx-phenix {
   position: absolute;
-  left: 190px; bottom: -26px;
+  left: 230px; bottom: -26px;   /* 收银机（最宽 225px）右侧之外，不遮挡机身 */
   width: 170px;
   z-index: 150;
   cursor: pointer;
@@ -452,7 +452,7 @@ import { computed } from 'vue'
 /* ======== 气泡 v4（Q 版可爱风；absolute 相对收银机） ======== */
 .fx-bubble {
   position: absolute;
-  left: 205px; bottom: 168px;   /* 凤凰上方，尖尖朝下指凤凰 */
+  left: 232px; bottom: 168px;   /* 凤凰上方，尖尖朝下指凤凰；不遮挡收银机 */
   width: 180px;
   background: #fffdf6;                 /* 奶油白 */
   border: 3px solid var(--ink);

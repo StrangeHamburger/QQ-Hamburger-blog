@@ -5,6 +5,7 @@ import FormulaScroll from './FormulaScroll.vue'
 import SeaLife from './SeaLife.vue'
 import { burgerLayers } from '../data/content.js'
 import { spawnBubbles, wobble } from '../utils/bubbles.js'
+import { playSound } from '../utils/sound.js'
 import ResumeChannel from './channels/ResumeChannel.vue'
 import GithubChannel from './channels/GithubChannel.vue'
 import InterestsChannel from './channels/InterestsChannel.vue'
@@ -42,6 +43,8 @@ const activeChannel = computed(() => (activeId.value ? channelMap[activeId.value
 const activeMeta = computed(() => burgerLayers.find(l => l.id === activeId.value))
 
 function onHoverLayer(i) { activeLayer.value = i }
+
+// 卷轴条目点击 → 打开栏目抽屉
 function onSelectLayer(i) {
   const layer = burgerLayers[i]
   if (!layer) return
@@ -49,13 +52,27 @@ function onSelectLayer(i) {
   openedAt = performance.now()   // 标记这次点击是"打开"，避免 document 层立即又关掉
   detailOpen.value = true
 }
+
+// 食材来源气泡：点汉堡的某一层 → 气泡悬在面包上方，2 秒消散
+const tip = ref(null)
+let tipTimer = null
+function onLayerClick(i, e) {
+  tip.value = i
+  playSound('bubble')
+  spawnBubbles(e.clientX, e.clientY, 4)
+  clearTimeout(tipTimer)
+  tipTimer = setTimeout(() => (tip.value = null), 2000)   // 最多 2 秒
+}
 function closeDetail() {
   detailOpen.value = false
   activeId.value = ''   // v-if 变 false → Vue transition 走滑出动画（380ms）后自动卸载
 }
 
-// Esc 也能关抽屉（和项目弹窗一致）
-function onEscKey(e) { if (e.key === 'Escape') closeDetail() }
+// Esc 关抽屉
+function onEscKey(e) {
+  if (e.key !== 'Escape') return
+  if (detailOpen.value) closeDetail()
+}
 watch(detailOpen, (v) => {
   if (v) window.addEventListener('keydown', onEscKey)
   else window.removeEventListener('keydown', onEscKey)
@@ -127,9 +144,16 @@ function onTitleClick(e) {
         @hover-layer="onHoverLayer"
         @select-layer="onSelectLayer"
       />
-      <!-- 右：2.5D 汉堡 -->
+      <!-- 右：2.5D 汉堡（点击层 = 食材来源气泡） -->
       <div class="iso-stage" @mousemove="onTilt" @mouseleave="resetTilt">
-        <Burger25D :active-layer="activeLayer" :tilt="tilt" />
+        <Burger25D :active-layer="activeLayer" :tilt="tilt" @layer-click="onLayerClick" />
+        <!-- 食材来源气泡 -->
+        <transition name="tip-pop">
+          <div v-if="tip !== null" class="ingredient-tip" role="status">
+            <span class="tip-name mono-label">{{ burgerLayers[tip].ingredient }} · 来源</span>
+            <span class="tip-text">{{ burgerLayers[tip].source }}</span>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -250,6 +274,49 @@ function onTitleClick(e) {
   background: radial-gradient(ellipse at center, rgba(36, 66, 94, 0.09), transparent 70%);
   border-radius: 50%;
   pointer-events: none;
+}
+
+/* ======== 食材来源气泡（点击汉堡层弹出，2 秒） ======== */
+.ingredient-tip {
+  position: absolute;
+  right: -36px; bottom: 282px;   /* 锚定舞台底部：气泡悬在顶层面包上方半格，尖尖指向面包 */
+  width: 224px;
+  background: #fffdf6;
+  border: 3px solid var(--ink);
+  border-radius: 22px;
+  padding: 11px 15px;
+  display: flex; flex-direction: column; gap: 3px;
+  box-shadow: 0 4px 0 var(--ink-12), 0 12px 24px rgba(26, 26, 24, 0.15);
+  z-index: 30;
+  pointer-events: none;
+}
+/* 尖尖朝下指面包 */
+.ingredient-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 42px;
+  border: 9px solid transparent;
+  border-top-color: var(--ink);
+}
+.tip-name {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--tomato);
+  font-weight: 700;
+}
+.tip-text {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  font-weight: 600;
+}
+.tip-pop-enter-active { transition: transform 420ms var(--ease-spring), opacity 260ms ease; }
+.tip-pop-enter-from { transform: translateY(10px) scale(0.7); opacity: 0; }
+.tip-pop-leave-active { transition: opacity 200ms ease; }
+.tip-pop-leave-to { opacity: 0; }
+
+@media (max-width: 767px) {
+  .ingredient-tip { right: -8px; bottom: 95px; width: 196px; }
 }
 
 /* ======== 详情抽屉 ======== */

@@ -8,6 +8,7 @@ import BurgerSection from './BurgerSection.vue'
 import MiniComputer from './MiniComputer.vue'
 import SeaLife from './SeaLife.vue'
 import DepthTerminal from './DepthTerminal.vue'
+import AboutSection from './AboutSection.vue'
 
 // embedded：被内嵌在笔记本屏幕门户里（ScreenPortal）时的模式
 // 隐藏右下角小电脑、改根高度为 100% 适配门户滚动容器
@@ -28,8 +29,10 @@ function updateActiveSection() {
   const rect = root ? root.getBoundingClientRect() : { top: 0, height: window.innerHeight }
   const line = rect.top + rect.height * 0.38   // 屏幕上方 38% 处作为分界线
   let cur = 'top'
+  const about = document.getElementById('about')
   const works = document.getElementById('works')
   const burger = document.getElementById('burger')
+  if (about && about.getBoundingClientRect().top <= line) cur = 'about'
   if (works && works.getBoundingClientRect().top <= line) cur = 'works'
   if (burger && burger.getBoundingClientRect().top <= line) cur = 'burger'
   activeSection.value = cur
@@ -38,8 +41,6 @@ function updateActiveSection() {
 onMounted(() => {
   offDepth = onScrollProgress((p) => {
     depth.value = p
-    // 背景层直接改 style（不走 Vue 响应式，滚动帧零开销）
-    if (veilEl.value) veilEl.value.style.backgroundPositionY = (p * 100).toFixed(2) + '%'
     updateActiveSection()
   })
 })
@@ -103,7 +104,7 @@ onMounted(() => {
     <!-- ======== 下潜层：随滚动变深的固定背景 / 进度条 / 深度计 ======== -->
     <div ref="veilEl" class="depth-veil" aria-hidden="true"></div>
     <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-fill" :style="{ width: (depth * 100).toFixed(1) + '%' }"></span></div>
-    <div class="depth-gauge mono-label" :class="{ deep: depth > 0.55 }" aria-hidden="true">DEPTH -{{ depthM }} M</div>
+    <div class="depth-gauge mono-label" aria-hidden="true">DEPTH -{{ depthM }} M</div>
 
     <!-- ======== 导航 ======== -->
     <header class="nav">
@@ -111,6 +112,7 @@ onMounted(() => {
         <span class="nav-brand mono-label">{{ profile.name }}<span class="nav-brand-suffix"> · CS PORTFOLIO</span></span>
         <nav class="nav-links" aria-label="页面导航">
           <button class="nav-link mono-label" :class="{ active: activeSection === 'top' }" @click="scrollToId('hero')">顶部</button>
+          <button class="nav-link mono-label" :class="{ active: activeSection === 'about' }" @click="scrollToId('about')">关于</button>
           <button class="nav-link mono-label" :class="{ active: activeSection === 'works' }" @click="scrollToId('works')">项目</button>
           <button class="nav-link mono-label" :class="{ active: activeSection === 'burger' }" @click="scrollToId('burger')">汉堡秘方</button>
         </nav>
@@ -187,6 +189,9 @@ onMounted(() => {
       </div>
     </section>
 
+    <!-- ======== 关于我（厨师档案） ======== -->
+    <AboutSection />
+
     <!-- ======== 项目精选 ======== -->
     <ProjectsShowcase :embedded="embedded" />
 
@@ -220,22 +225,24 @@ onMounted(() => {
 <style scoped>
 /* ======== 下潜背景层 ========
    fixed 于可视屏幕（门户内经 transform 包含 = 贴住笔记本屏幕；移动端 = 贴住视口），
-   不随内容滚动；滚动时按进度上移 background-position，露出渐变更深处。
-   渐变 300% 高：顶部 1/3 ≈ 原米白纸面，底部 1/3 ≈ 深海蓝。
+   不随内容滚动。元素高 300%，随 --dp（滚动进度）做纯合成器位移：
+   进度 0 露出渐变顶部 1/3（米白纸面），进度 1 露出底部 1/3（深海蓝）。
+   用 transform 而不是 background-position：滚动时零重绘，不掉帧。
    注意：门户内 .portal-boot/.portal-scroll 背景已透明，本层不需要 isolation/z-index
    也能落在 canvas 之上、内容之下——不要给 .home 加 isolation/合成提示，
    否则整个内容子树会被降采样成纹理，文字全部发糊。 */
 .home { min-height: 100dvh; position: relative; }
 .depth-veil {
-  position: fixed; inset: 0; z-index: -1;
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 300%;
+  z-index: -1;
   pointer-events: none;
-  /* 渐变取主题 navy 的灰蓝家族（低饱和、微暖灰过渡），避免与番茄红/芥末黄打架 */
-  background-color: #4d6a7d;   /* 兜底：渐变万一未铺满也不露出 3D 画布 */
+  transform: translateY(calc(var(--dp, 0) * -66.66%));
+  /* 渐变：暖米白起步，浅蓝收尾（低饱和、微暖灰过渡） */
+  background-color: #aec9d6;   /* 兜底：渐变万一未铺满也不露出 3D 画布 */
   background-image: linear-gradient(180deg,
-    #faf6ef 0%, #f5f1e8 15%, #ebe6da 27%, #d9d8cc 39%,
-    #c2c8c2 51%, #a6b6b6 63%, #879da3 75%, #68838f 87%, #4d6a7d 100%);
-  background-size: 100% 300%;
-  background-repeat: no-repeat;
+    #faf6ef 0%, #f5f1e8 15%, #eceadf 27%, #dce1d6 39%,
+    #ccd8d2 51%, #c2d6d8 63%, #bcd2d8 75%, #b6cfd8 87%, #aec9d6 100%);
 }
 
 /* 番茄酱 + 芥末酱条纹滚动进度条 */
@@ -257,7 +264,7 @@ onMounted(() => {
   z-index: 60;
   font-size: 10px;
   color: var(--ink-50);
-  background: rgba(255, 253, 248, 0.55);
+  background: rgba(255, 253, 248, 0.6);
   border: 1px solid var(--ink-12);
   border-radius: 999px;
   padding: 4px 12px;
@@ -265,13 +272,17 @@ onMounted(() => {
   pointer-events: none;
   transition: color var(--dur), background var(--dur), border-color var(--dur);
 }
-.depth-gauge.deep {
-  color: rgba(255, 253, 248, 0.78);
-  background: rgba(26, 48, 72, 0.42);
-  border-color: rgba(255, 253, 248, 0.22);
-}
 
 /* 页脚：深海色块收尾，顶部波浪边呼应 Hero 的深海主题 */
+.site-footer { margin-top: var(--space-6); }
+.footer-wave {
+  display: block;
+  width: 100%;
+  height: 30px;
+  color: var(--navy);
+  margin-bottom: -1px;
+}
+/* 页脚：深色海床收尾，顶部波浪边呼应 Hero 的深海主题 */
 .site-footer { margin-top: var(--space-6); }
 .footer-wave {
   display: block;
@@ -293,7 +304,7 @@ onMounted(() => {
 .footer-copy { color: rgba(255, 253, 248, 0.35); position: relative; z-index: 1; }
 .footer-body > span { position: relative; z-index: 1; }
 
-/* 海床装饰：海草剪影 + 生物荧光点 */
+/* 海床装饰：海草剪影 + 荧光点 */
 .footer-seagrass {
   position: absolute;
   left: 0; right: 0; bottom: -4px;

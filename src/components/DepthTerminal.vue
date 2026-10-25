@@ -101,6 +101,7 @@ function submit() {
 
   if (head === 'help') {
     HELP.forEach(l => print(l))
+    print('传闻：在页面上输入 ↑↑↓↓←→←→BA，天上有东西掉下来…', 'dim')
   } else if (head === 'whoami' || cmd.includes('我是谁') || cmd.includes('你是谁')) {
     print('QQ Hamburger · 25 届 CS · 蟹堡王深夜值班厨师（兼职修企鹅电脑）')
   } else if (head === 'ls') {
@@ -120,14 +121,28 @@ function submit() {
     print('[sudo] 蟹老板 的密码：********')
     setTimeout(() => print('蟹老板：密码错误。这家店我说了算，年轻人。', 'warn'), 500)
   } else if (head === 'make' || head === 'cook' || cmd.includes('蟹黄') || cmd.includes('汉堡')) {
-    if (head === 'sudo') { /* 交给下方 sudo 分支 */ }
-    else if ((arg && (arg.includes('burger') || arg.includes('堡'))) || cmd.includes('蟹黄') || cmd.includes('汉堡')) {
+    if ((arg && (arg.includes('burger') || arg.includes('堡'))) || cmd.includes('蟹黄') || cmd.includes('汉堡')) {
       printSeq([
         '正在热锅…滋滋滋',
-        '铺上面包 🍞 → 肉饼 🥩 → 芝士 🧀 → 生菜 🥬 → 番茄 🍅',
-        '浇上秘方酱料（这一步删掉了 30 行代码）',
-        '✅ 蟹黄堡完成！好看又好吃。'
-      ])
+        '铺上面包 → 肉饼 → 芝士 → 生菜 → 番茄',
+        '浇上秘方酱料（这一步删掉了 30 行代码）'
+      ], 520)
+      // 像素蟹黄堡：逐行弹出，按层上色。
+      // 每行 = 前导空格 + 等宽块字符，(30 - 宽度) / 2 居中，保证层层对齐
+      const art = [
+        ['        ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-bun'],
+        ['    ██████████████████████', 'c-bun'],
+        ['  ██████████████████████████', 'c-bun'],
+        [' ▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒▓▒', 'c-lettuce'],
+        ['  ██████████████████████████', 'c-cheese'],
+        [' ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒', 'c-patty'],
+        ['    ██████████████████████', 'c-tomato-line'],
+        ['  ██████████████████████████', 'c-bun'],
+        ['      ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀', 'c-bun'],
+        ['▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄', 'c-plate']
+      ]
+      art.forEach((l, i) => setTimeout(() => print(l[0], l[1]), 1900 + i * 130))
+      setTimeout(() => print('✅ 蟹黄堡完成！好看又好吃。', 'warn'), 1900 + art.length * 130 + 250)
     } else {
       print('make: 不知道要做什么。试试 make burger', 'warn')
     }
@@ -260,6 +275,13 @@ onBeforeUnmount(() => {
 .dt-line.cmd { color: #d8ffe4; }
 .dt-line.warn { color: #ffd27d; text-shadow: 0 0 6px rgba(255, 200, 100, 0.4); }
 .dt-line.dim { opacity: 0.6; }
+/* 像素蟹黄堡：按层上色 */
+.dt-line.c-bun { color: #ffd27d; text-shadow: 0 0 5px rgba(255, 210, 125, 0.35); }
+.dt-line.c-lettuce { color: #8fd974; text-shadow: 0 0 5px rgba(143, 217, 116, 0.35); }
+.dt-line.c-cheese { color: #ffe9a8; }
+.dt-line.c-patty { color: #b5763b; }
+.dt-line.c-tomato-line { color: #ff8a70; }
+.dt-line.c-plate { color: rgba(200, 230, 220, 0.55); }
 
 .dt-inputline { display: flex; gap: 8px; align-items: baseline; }
 .dt-prompt { color: #ffd27d; flex-shrink: 0; }
