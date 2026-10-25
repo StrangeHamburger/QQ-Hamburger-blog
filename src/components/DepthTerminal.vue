@@ -101,7 +101,6 @@ function submit() {
 
   if (head === 'help') {
     HELP.forEach(l => print(l))
-    print('传闻：在页面上输入 ↑↑↓↓←→←→BA，天上有东西掉下来…', 'dim')
   } else if (head === 'whoami' || cmd.includes('我是谁') || cmd.includes('你是谁')) {
     print('QQ Hamburger · 25 届 CS · 蟹堡王深夜值班厨师（兼职修企鹅电脑）')
   } else if (head === 'ls') {

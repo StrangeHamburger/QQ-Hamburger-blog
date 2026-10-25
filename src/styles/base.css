@@ -98,19 +98,6 @@ html {
   100% { transform: translate(var(--dx, 0px), -76px) scale(1); opacity: 0; }
 }
 
-/* ============ Konami 蟹黄堡雨 ============ */
-.burger-rain {
-  position: fixed; top: -44px;
-  z-index: 9997;
-  font-size: 26px;
-  pointer-events: none;
-  animation: burger-fall linear forwards;
-}
-@keyframes burger-fall {
-  from { transform: translateY(0) rotate(-20deg); }
-  to { transform: translateY(110vh) rotate(340deg); }
-}
-
 /* ============ 微交互 ============ */
 /* 滚动入场（v-reveal）：初始下移隐藏，进入视口时淡入复位
    注意：不用 will-change:transform——它会创建 containing block，

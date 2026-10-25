@@ -1545,67 +1545,82 @@ function makeWelcomeTexture() {
   g.strokeStyle = 'rgba(242,184,75,0.4)'
   g.lineWidth = 2
   g.stroke()
-  // 迷你汉堡（canvas 画，从上到下：面包片→菜→芝士→肉饼→番茄→面包片）
+  // 迷你汉堡 v2（对称精修版：圆顶面包→波浪生菜→融芝士→肉饼→番茄→底包）
   const bx = 512, by = 196
-  // ① 顶层面包片（右移，弧度圆润）
-  g.fillStyle = '#f0ad4a'
+  // ① 顶层面包：圆顶 + 渐变 + 高光 + 芝麻
+  const bunGrad = g.createLinearGradient(bx, by - 64, bx, by - 26)
+  bunGrad.addColorStop(0, '#f6c877')
+  bunGrad.addColorStop(0.55, '#eab155')
+  bunGrad.addColorStop(1, '#d3913f')
+  g.fillStyle = bunGrad
   g.beginPath()
-  g.ellipse(bx + 15, by - 30, 38, 27, 0, Math.PI, true)
+  g.moveTo(bx - 56, by - 26)
+  g.bezierCurveTo(bx - 58, by - 52, bx - 34, by - 64, bx, by - 64)
+  g.bezierCurveTo(bx + 34, by - 64, bx + 58, by - 52, bx + 56, by - 26)
+  g.closePath()
   g.fill()
-  // 顶包高光
-  g.fillStyle = 'rgba(255,255,255,0.25)'
+  g.fillStyle = 'rgba(255,255,255,0.3)'
   g.beginPath()
-  g.ellipse(bx + 11, by - 44, 14, 5, -0.5, 0, Math.PI * 2)
+  g.ellipse(bx - 22, by - 50, 16, 5, -0.28, 0, Math.PI * 2)
   g.fill()
-  // 芝麻（沿圆顶弧线）
   g.fillStyle = '#fff3d0'
-  for (let i = 0; i < 7; i++) {
-    const a = 0.15 + (i / 6) * 0.8   // 只在上弧
-    const sx = bx + 15 + Math.cos(Math.PI - a * Math.PI) * 27
-    const sy = by - 30 - Math.sin(a * Math.PI) * 23
+  for (const [sx, sy, sa] of [[-38, -40, -0.5], [-16, -52, -0.2], [6, -56, 0.1], [28, -50, 0.35], [44, -38, 0.5]]) {
     g.beginPath()
-    g.ellipse(sx, sy, 3.2, 1.9, a * 3, 0, Math.PI * 2)
+    g.ellipse(bx + sx, by + sy, 3.4, 2, sa, 0, Math.PI * 2)
     g.fill()
   }
-  // ② 生菜（宽，两端伸出，波浪感）
-  g.fillStyle = '#7ed260'
+  // ② 生菜：条 + 波浪底边
+  g.fillStyle = '#5ea348'
   g.beginPath()
-  g.roundRect(bx - 42, by + 1, 84, 9, 4)
+  g.roundRect(bx - 58, by - 26, 116, 10, 5)
   g.fill()
-  g.fillStyle = '#9ce07e'
-  for (let i = -3; i <= 3; i++) {
+  g.fillStyle = '#6fb455'
+  for (let i = 0; i < 8; i++) {
     g.beginPath()
-    g.ellipse(bx + i * 12, by + 3, 6, 2.5, 0, 0, Math.PI * 2)
+    g.arc(bx - 49 + i * 14, by - 16, 7, 0, Math.PI)
     g.fill()
   }
-  // ③ 芝士（宽）
+  // ③ 芝士：融岩滴
   g.fillStyle = '#ffd24a'
   g.beginPath()
-  g.roundRect(bx - 40, by + 11, 80, 9, 3)
+  g.moveTo(bx - 52, by - 14)
+  g.lineTo(bx + 52, by - 14)
+  g.lineTo(bx + 52, by - 6)
+  g.lineTo(bx + 38, by - 6)
+  g.lineTo(bx + 34, by + 2)
+  g.lineTo(bx + 24, by - 6)
+  g.lineTo(bx - 30, by - 6)
+  g.lineTo(bx - 38, by + 3)
+  g.lineTo(bx - 52, by - 6)
+  g.closePath()
   g.fill()
-  g.fillStyle = '#ffe98a'
-  g.fillRect(bx - 40, by + 11, 80, 4)
-  // ④ 肉饼（棕色，圆角）
-  g.fillStyle = '#8a5a34'
+  // ④ 肉饼：渐变 + 烤痕
+  const pattyGrad = g.createLinearGradient(bx, by - 4, bx, by + 10)
+  pattyGrad.addColorStop(0, '#9a6540')
+  pattyGrad.addColorStop(1, '#6d4226')
+  g.fillStyle = pattyGrad
   g.beginPath()
-  g.roundRect(bx - 37, by + 21, 74, 12, 4)
+  g.roundRect(bx - 54, by - 4, 108, 14, 7)
   g.fill()
-  g.fillStyle = 'rgba(255,255,255,0.18)'
-  g.fillRect(bx - 37, by + 22, 74, 3)
-  // ⑤ 番茄（红）
+  g.fillStyle = 'rgba(255,255,255,0.14)'
+  g.fillRect(bx - 50, by - 2, 100, 3)
+  g.fillStyle = 'rgba(60,30,10,0.5)'
+  for (const mx of [bx - 30, bx - 6, bx + 18, bx + 40]) g.fillRect(mx, by + 1, 3, 9)
+  // ⑤ 番茄
   g.fillStyle = '#ff5a3c'
   g.beginPath()
-  g.roundRect(bx - 36, by + 34, 72, 10, 3)
+  g.roundRect(bx - 50, by + 12, 100, 8, 4)
   g.fill()
   g.fillStyle = 'rgba(255,255,255,0.22)'
-  g.fillRect(bx - 36, by + 35, 72, 3)
-  // ⑥ 底层面包片（圆角 + 阴影线）
-  g.fillStyle = '#f7c56a'
+  g.fillRect(bx - 50, by + 13, 100, 2.5)
+  // ⑥ 底层面包
+  const bun2Grad = g.createLinearGradient(bx, by + 22, bx, by + 37)
+  bun2Grad.addColorStop(0, '#f2c36b')
+  bun2Grad.addColorStop(1, '#d99f4a')
+  g.fillStyle = bun2Grad
   g.beginPath()
-  g.roundRect(bx - 35, by + 45, 70, 12, 5)
+  g.roundRect(bx - 52, by + 22, 104, 15, [6, 6, 12, 12])
   g.fill()
-  g.fillStyle = 'rgba(180,120,40,0.35)'
-  g.fillRect(bx - 35, by + 54, 70, 3)
 
   // 站名（发光）
   g.shadowColor = 'rgba(255,214,140,0.9)'

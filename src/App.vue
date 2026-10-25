@@ -6,7 +6,6 @@ import ScreenPortal from './components/ScreenPortal.vue'
 import { getPortal, portalDeepestAt } from './three/portalRef.js'
 import { initGlobalClickSound, initGlobalHoverSound } from './utils/sound.js'
 import { initGlobalBubbles } from './utils/bubbles.js'
-import { initKonami } from './utils/konami.js'
 
 // 全局点击音效（深海餐厅主题，按元素自动选音）
 onMounted(initGlobalClickSound)
@@ -14,8 +13,6 @@ onMounted(initGlobalClickSound)
 onMounted(initGlobalHoverSound)
 // 全局点击气泡（下潜世界触感）
 onMounted(initGlobalBubbles)
-// Konami 秘技 → 蟹黄堡雨
-onMounted(initKonami)
 
 // 标签页彩蛋：切走时标题求助，回来恢复
 const ORIGIN_TITLE = document.title
