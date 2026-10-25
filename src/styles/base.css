@@ -48,6 +48,19 @@ button {
   outline-offset: 2px;
 }
 
+/* 定制滚动条：细墨色条，融入纸面（scrollbar-color 会继承给门户滚动容器） */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 26, 24, 0.28) transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--ink-20);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--ink-40); }
+
 /* ============ 通用 ============ */
 .container {
   max-width: var(--content-max);
@@ -60,6 +73,29 @@ button {
   font-size: var(--text-xs);
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+/* ============ 点击气泡粒子 ============ */
+/* Q 版：圆润饱满 + 大高光，弹出时先 Q 弹放大再慢悠悠飘走 */
+.tap-bubble {
+  position: fixed; z-index: 9998;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 33% 28%, #ffffff 0 18%, rgba(255, 255, 255, 0.55) 30%, rgba(215, 232, 240, 0.28) 58%, rgba(150, 180, 200, 0.42) 92%, rgba(140, 170, 192, 0.55) 100%);
+  box-shadow:
+    inset -2px -3px 4px rgba(255, 255, 255, 0.55),
+    inset 1px 2px 3px rgba(255, 255, 255, 0.8),
+    0 1px 3px rgba(70, 100, 130, 0.15);
+  animation: tap-rise var(--dur, 1300ms) cubic-bezier(0.3, 0.75, 0.4, 1) forwards;
+}
+@keyframes tap-rise {
+  0% { transform: translate(0, 6px) scale(0); opacity: 0; }
+  28% { transform: translate(calc(var(--dx, 0px) * 0.25), -10px) scale(1.18); opacity: 1; }
+  48% { transform: translate(calc(var(--dx, 0px) * 0.45), -26px) scale(0.94); opacity: 0.95; }
+  74% { transform: translate(calc(var(--dx, 0px) * 0.75), -50px) scale(1.06); opacity: 0.6; }
+  100% { transform: translate(var(--dx, 0px), -76px) scale(1); opacity: 0; }
 }
 
 /* ============ 微交互 ============ */

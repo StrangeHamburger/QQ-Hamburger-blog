@@ -10,6 +10,8 @@ const hoverIndex = ref(-1)
 
 function toggle() {
   open.value = !open.value
+  // 收起时若指针仍停在条目上（条目随即被裁剪，mouseleave 不会触发），立即复位汉堡层
+  if (!open.value) onLeave()
   // 音效由全局委托处理（展开 paper / 收起 click）
   // 防止按钮聚焦触发浏览器 scroll-into-view 导致页面跳动
   if (document.activeElement) document.activeElement.blur()
@@ -117,6 +119,7 @@ function onSelect(i) { emit('select-layer', i) }
   height: 0;
   margin-bottom: 0;
   opacity: 0;
+  visibility: hidden;   /* 收起后内部 img 矩形仍在，标记隐藏让门户命中扫描跳过（见 portalRef.js） */
 }
 .scroll-top-img {
   display: block;
@@ -196,7 +199,7 @@ function onSelect(i) { emit('select-layer', i) }
 
 .scroll-stamp {
   position: absolute; right: -8px; top: 8px;
-  font-size: 7px; color: var(--tomato);
+  font-size: 9px; color: var(--tomato);
   border: 1.5px solid var(--tomato); border-radius: 3px;
   padding: 2px 6px; transform: rotate(12deg);
   transition: opacity 260ms ease;
@@ -218,12 +221,18 @@ function onSelect(i) { emit('select-layer', i) }
   overflow: hidden;
   opacity: 0;
   transform: translateY(-8px);
-  transition: grid-template-rows 460ms var(--ease-out), opacity 320ms ease 100ms, transform 460ms var(--ease-out);
+  /* visibility 标记隐藏态：0fr 收起时子条目的矩形仍完整存在（只是被裁剪），
+     门户命中扫描按矩形测试会误命中，需借此跳过（见 portalRef.js）；
+     关闭时延迟到收起动画结束再隐藏，避免内容瞬间消失 */
+  visibility: hidden;
+  transition: grid-template-rows 460ms var(--ease-out), opacity 320ms ease 100ms, transform 460ms var(--ease-out), visibility 0s linear 460ms;
 }
 .formula-panel.expanded {
   grid-template-rows: 1fr;
   opacity: 1;
   transform: translateY(0);
+  visibility: visible;
+  transition: grid-template-rows 460ms var(--ease-out), opacity 320ms ease 100ms, transform 460ms var(--ease-out), visibility 0s;
 }
 
 .panel-inner {
@@ -240,7 +249,7 @@ function onSelect(i) { emit('select-layer', i) }
   padding: 9px 14px; background: var(--navy);
   color: var(--cream);
 }
-.formula-head-label { font-size: 8px; letter-spacing: 0.2em; }
+.formula-head-label { font-size: 10px; letter-spacing: 0.1em; }   /* 0.1em：窄面板（手机 200px）下不换行 */
 
 .formula-list { list-style: none; padding: 6px 0; }
 
@@ -258,7 +267,7 @@ function onSelect(i) { emit('select-layer', i) }
 .formula-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .formula-info { display: flex; flex-direction: column; flex: 1; }
 .formula-name { font-size: 13px; font-weight: 600; color: var(--ink); }
-.formula-channel { font-size: 7px; letter-spacing: 0.14em; color: var(--ink-50); }
+.formula-channel { font-size: 10px; letter-spacing: 0.14em; color: var(--ink-50); }
 .formula-arrow { color: var(--ink-30); transition: transform var(--dur-fast), color var(--dur-fast); }
 .formula-item:hover .formula-arrow { transform: translateX(4px); color: var(--tomato); }
 </style>

@@ -105,7 +105,7 @@ function toggle(i) {
 .hobby-block:hover .hb-name { transform: translateX(3px); }
 
 .hb-desc {
-  font-size: 7px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.2em;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
@@ -114,7 +114,7 @@ function toggle(i) {
 .hb-arrow {
   position: absolute;
   right: 10px; bottom: 8px;
-  font-size: 9px;
+  font-size: 10px;
   color: rgba(255, 255, 255, 0.7);
   transition: transform var(--dur) var(--ease-out);
 }

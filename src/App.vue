@@ -5,11 +5,14 @@ import KrustyScene from './components/KrustyScene.vue'
 import ScreenPortal from './components/ScreenPortal.vue'
 import { getPortal, portalDeepestAt } from './three/portalRef.js'
 import { initGlobalClickSound, initGlobalHoverSound } from './utils/sound.js'
+import { initGlobalBubbles } from './utils/bubbles.js'
 
 // 全局点击音效（深海餐厅主题，按元素自动选音）
 onMounted(initGlobalClickSound)
 // 全局悬停音效（hover 时轻响）
 onMounted(initGlobalHoverSound)
+// 全局点击气泡（下潜世界触感）
+onMounted(initGlobalBubbles)
 
 // 图片预加载：页面加载完成即提前拉取未挂载 DOM 的图片（敬请期待/彩蛋/卷轴冒图等），
 // 用户滚动到对应区域时图片已在缓存里，秒开
@@ -61,10 +64,21 @@ function onLeave() {
 //   - 点击门户外 → 派发 portal-outside-click（场景监听后飞回远观）
 //   - 滚轮 → 转发给 .portal-scroll（保持门户内滚动）
 function onPortalHit(e) {
-  const portal = getPortal()
-  if (!portal) return
-  const target = portalDeepestAt(portal, e.clientX, e.clientY)
-  if (target && target !== portal) {
+  // 终端态：命中根换成终端子树，点击全部留在终端内，不外泄到站点
+  const term = document.body.classList.contains('term-open') ? document.querySelector('.depth-term') : null
+  const root = term ?? getPortal()
+  if (!root) return
+  const target = portalDeepestAt(root, e.clientX, e.clientY)
+  if (term) {
+    if (target && target !== root) {
+      target.dispatchEvent(new MouseEvent('click', {
+        bubbles: true, cancelable: true, view: window,
+        clientX: e.clientX, clientY: e.clientY
+      }))
+    }
+    return
+  }
+  if (target && target !== root) {
     target.dispatchEvent(new MouseEvent('click', {
       bubbles: true, cancelable: true, view: window,
       clientX: e.clientX, clientY: e.clientY
@@ -73,7 +87,24 @@ function onPortalHit(e) {
     window.dispatchEvent(new CustomEvent('portal-outside-click'))
   }
 }
+// 终端态：mousedown 不改变焦点（原生 mousedown 会把终端输入框的焦点吹掉，导致无法输入）
+function onOverlayMouseDown(e) {
+  if (document.body.classList.contains('term-open')) e.preventDefault()
+}
+
 function onPortalWheel(e) {
+  // 终端态：滚轮给终端正文，不再滚动后面的站点页面
+  if (document.body.classList.contains('term-open')) {
+    const dtBody = document.querySelector('.depth-term .dt-body')
+    if (dtBody && dtBody.scrollHeight > dtBody.clientHeight) {
+      const prev = dtBody.style.scrollBehavior
+      dtBody.style.scrollBehavior = 'auto'
+      dtBody.scrollTop += e.deltaY
+      dtBody.style.scrollBehavior = prev
+    }
+    e.preventDefault()
+    return
+  }
   // 弹窗打开时：滚轮滚弹窗内部（.pm-body），否则滚门户主体
   const modalBody = document.querySelector('.project-modal .pm-body')
   if (modalBody) {
@@ -118,11 +149,18 @@ function onPortalMove(e) {
   if (hoverRaf) return
   hoverRaf = requestAnimationFrame(() => {
     hoverRaf = 0
+    // 终端态：悬停也只落在终端子树内
+    const term = document.body.classList.contains('term-open') ? document.querySelector('.depth-term') : null
     const portal = getPortal()
-    if (!portal) return
-    const target = portalDeepestAt(portal, x, y)
-    const el = target && target !== portal ? target.closest(INTERACTIVE_SEL) : null
-    if (el === hoverEl) return
+    const root = term ?? portal
+    if (!root) return
+    const target = portalDeepestAt(root, x, y)
+    const el = target && target !== root ? target.closest(INTERACTIVE_SEL) : null
+    if (el === hoverEl) {
+      // 悬停目标未变也要转发 mousemove：项目卡 3D 倾斜、磁性按钮都靠它驱动
+      if (el) el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: x, clientY: y, view: window }))
+      return
+    }
     if (hoverEl) {
       hoverEl.classList.remove('is-hover')
       hoverEl.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
@@ -133,6 +171,7 @@ function onPortalMove(e) {
       el.classList.add('is-hover')
       el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+      el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: x, clientY: y, view: window }))
     }
   })
 }
@@ -154,7 +193,7 @@ function clearPortalHover() {
     <KrustyScene :phase="phase" @arrive="onArrive" @leave="onLeave" />
     <ScreenPortal :phase="phase" />
     <!-- 门户 overlay：接管点击/滚轮/悬停（见 onPortalHit/onPortalWheel/onPortalMove 注释） -->
-    <div v-if="phase === 'home'" class="portal-hit" @click="onPortalHit" @wheel="onPortalWheel" @mousemove="onPortalMove"></div>
+    <div v-if="phase === 'home'" class="portal-hit" @click="onPortalHit" @wheel="onPortalWheel" @mousemove="onPortalMove" @mousedown="onOverlayMouseDown"></div>
   </template>
 </template>
 
@@ -166,4 +205,6 @@ function clearPortalHover() {
   z-index: 10;
   cursor: default;
 }
+/* 终端打开时：鼠标在屏幕上变为文本光标，页面交互自然被终端元素接管 */
+body.term-open .portal-hit { cursor: text; }
 </style>

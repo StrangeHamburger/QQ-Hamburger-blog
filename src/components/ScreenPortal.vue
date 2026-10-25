@@ -52,7 +52,8 @@ onBeforeUnmount(() => {
   z-index: 1;
 }
 
-/* 引导层：淡入 + 轻微放大（"启动进入桌面"），不覆盖外层 matrix */
+/* 引导层：淡入 + 轻微放大（"启动进入桌面"），不覆盖外层 matrix
+   背景透明：纸色由 .depth-veil（PageHome）提供，否则会盖住下潜渐变 */
 .portal-boot {
   position: absolute;
   inset: 0;
@@ -60,7 +61,6 @@ onBeforeUnmount(() => {
   opacity: 0;
   transform-origin: 50% 50%;
   transition: transform 0.85s var(--ease-out), opacity 0.85s var(--ease-out);
-  background: var(--paper);
 }
 .screen-portal.visible {
   opacity: 1;
@@ -74,7 +74,8 @@ onBeforeUnmount(() => {
 
 /* 内嵌站点滚动容器
  * pointer-events: none：门户是透视投影，Chrome hit-test 失效（滚动偏移未应用），
- * 指针交互全部由 App.vue 的 .portal-hit overlay 接管（点击转发 + 滚轮转发）。 */
+ * 指针交互全部由 App.vue 的 .portal-hit overlay 接管（点击转发 + 滚轮转发）。
+ * 背景透明：纸色由 .depth-veil 提供（fixed 于屏幕，不随滚动）。 */
 .portal-scroll {
   position: absolute;
   inset: 0;
@@ -82,7 +83,6 @@ onBeforeUnmount(() => {
   overflow-x: hidden;
   scroll-behavior: smooth;
   overflow-anchor: none;   /* 禁用滚动锚定：卷轴开合改变内容高度时，防止浏览器自动调整 scrollTop 造成页面上下抖动 */
-  background: var(--paper);
   -webkit-overflow-scrolling: touch;
   pointer-events: none;
 }

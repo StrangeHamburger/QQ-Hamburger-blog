@@ -25,7 +25,7 @@
   /* 字体 */
   --font-sans: 'PingFang SC', 'Microsoft YaHei', -apple-system, 'Segoe UI', sans-serif;
   --font-serif: 'Noto Serif SC', 'Source Han Serif SC', Georgia, 'Times New Roman', serif;
-  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', 'PingFang SC', 'Microsoft YaHei', monospace;
 
   /* 字号阶梯（v3.1：hero 上限微调，移动端不压屏） */
   --text-hero: clamp(44px, 8.5vw, 104px);

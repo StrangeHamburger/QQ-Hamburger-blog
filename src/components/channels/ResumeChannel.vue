@@ -37,7 +37,7 @@ import { resume } from '../../data/content.js'
 
 <style scoped>
 .ch-label {
-  display: block; color: var(--tomato); font-size: 9px;
+  display: block; color: var(--tomato); font-size: 10px;
   margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--ink-08);
 }
 
@@ -73,7 +73,7 @@ import { resume } from '../../data/content.js'
 .re-line {
   display: block;
   margin-top: 12px;
-  font-size: 8px;
+  font-size: 10px;
   color: var(--tomato);
   letter-spacing: 0.3em;
 }
@@ -83,7 +83,7 @@ import { resume } from '../../data/content.js'
 .edu-org { color: var(--ink-50); font-size: 13px; }
 
 .skill-group { margin-bottom: 14px; }
-.sg-name { color: var(--ink-70); font-size: 9px; display: block; margin-bottom: 6px; }
+.sg-name { color: var(--ink-70); font-size: 10px; display: block; margin-bottom: 6px; }
 .sg-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .sg-tag {
   font-size: 12px; padding: 4px 10px;

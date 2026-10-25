@@ -1,8 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import Burger25D from './Burger25D.vue'
 import FormulaScroll from './FormulaScroll.vue'
+import SeaLife from './SeaLife.vue'
 import { burgerLayers } from '../data/content.js'
+import { spawnBubbles, wobble } from '../utils/bubbles.js'
 import ResumeChannel from './channels/ResumeChannel.vue'
 import GithubChannel from './channels/GithubChannel.vue'
 import InterestsChannel from './channels/InterestsChannel.vue'
@@ -44,16 +46,49 @@ function onSelectLayer(i) {
   const layer = burgerLayers[i]
   if (!layer) return
   activeId.value = layer.id
+  openedAt = performance.now()   // 标记这次点击是"打开"，避免 document 层立即又关掉
   detailOpen.value = true
 }
 function closeDetail() {
   detailOpen.value = false
   activeId.value = ''   // v-if 变 false → Vue transition 走滑出动画（380ms）后自动卸载
 }
+
+// Esc 也能关抽屉（和项目弹窗一致）
+function onEscKey(e) { if (e.key === 'Escape') closeDetail() }
+watch(detailOpen, (v) => {
+  if (v) window.addEventListener('keydown', onEscKey)
+  else window.removeEventListener('keydown', onEscKey)
+})
+onBeforeUnmount(() => window.removeEventListener('keydown', onEscKey))
+
+// 标准弹窗语义：抽屉开着时，点面板外的任何东西（背板、空白、装饰）都关闭。
+// 不能只靠背板自己的 @click：门户里转发点击落在"面积最小"的元素上，
+// 背板是全屏（面积最大），几乎总会被背板下方的小元素抢走。
+let openedAt = 0
+function onDocClick(e) {
+  if (!detailOpen.value) return
+  if (performance.now() - openedAt < 120) return   // 忽略打开抽屉的那次点击
+  if (e.target?.closest?.('.drawer-panel')) return // 面板内交给面板自己的控件
+  closeDetail()
+}
+onMounted(() => document.addEventListener('click', onDocClick))
+onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
+
+// 标题彩蛋：戳「汉堡包秘方」→ 果冻抖动 + 冒泡
+function onTitleClick(e) {
+  wobble(e.currentTarget)
+  spawnBubbles(e.clientX, e.clientY, 4)
+}
 </script>
 
 <template>
   <section class="burger-section" id="burger">
+    <!-- 深层海域：鱼群 / 灯笼鱼 / 远景鲸鱼（下潜叙事：越深越暗的生物） -->
+    <SeaLife type="fish" :pf="90" :dur="20" class="bs-fish" />
+    <SeaLife type="angler" :pf="120" :dur="24" class="bs-angler" />
+    <SeaLife type="whale" :pf="140" :dur="34" flip class="bs-whale" />
+
     <!-- 海底背景装饰（与 Hero 呼应） -->
     <div class="bs-bubbles" aria-hidden="true">
       <span class="bs-bubble b1"></span>
@@ -82,7 +117,7 @@ function closeDetail() {
 
     <div class="container" v-reveal>
       <span class="section-eyebrow mono-label">SECRET FORMULA</span>
-      <h2 class="section-title">汉堡包秘方</h2>
+      <h2 class="section-title" title="戳我一下" @click="onTitleClick">汉堡包秘方</h2>
       <p class="section-sub">六层秘方 · 从上到下，每一层都是一个栏目的入口</p>
     </div>
 
@@ -123,10 +158,14 @@ function closeDetail() {
   position: relative;   /* 背景装饰定位基准 */
   overflow: hidden;
   padding: var(--space-6) 0 var(--space-7);
-  border-top: 1px solid var(--ink-08);
+  /* 分区色带已由全局下潜背景层（PageHome .depth-veil）接管 */
 }
 
 /* ======== 海底背景装饰 ======== */
+.bs-fish { left: 4%; top: 38%; width: 140px; }
+.bs-angler { left: 10%; bottom: 4%; width: 118px; }
+.bs-whale { right: -50px; top: 5%; width: 270px; }
+
 .bs-bubbles { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .bs-bubble {
   position: absolute;
@@ -175,10 +214,13 @@ function closeDetail() {
 .section-eyebrow { color: var(--tomato); font-size: 11px; position: relative; z-index: 1; }
 .section-title {
   font-family: var(--font-serif);
-  font-size: var(--text-h2);
+  font-size: var(--text-h1);   /* 与「项目」同级标题，保持版面节奏一致 */
+  letter-spacing: 0.04em;
   margin-top: 4px;
   color: var(--ink);
   position: relative; z-index: 1;
+  cursor: pointer;
+  user-select: none;
 }
 .section-sub {
   margin-top: 8px;
@@ -240,7 +282,7 @@ function closeDetail() {
 }
 .drawer-num { color: var(--tomato); font-size: 13px; }
 .drawer-name { font-size: 19px; font-weight: 700; }
-.drawer-channel { font-size: 8px; color: var(--ink-50); margin-left: auto; letter-spacing: 0.15em; }
+.drawer-channel { font-size: 10px; color: var(--ink-50); margin-left: auto; letter-spacing: 0.15em; }
 .drawer-close { font-size: 24px; color: var(--ink-50); line-height: 1; padding: 0 4px; }
 
 .drawer-body { flex: 1; overflow-y: auto; padding: 22px; }
@@ -248,6 +290,7 @@ function closeDetail() {
 @media (max-width: 767px) {
   .burger-wrap { flex-direction: column; gap: 20px; }
   .iso-stage { flex: 0 0 280px; height: 300px; }
-  .drawer-panel { width: 100vw; }
+  /* 88vw：右侧留出一条背板空白，点空白即可关闭（100vw 时只能点 ×，太麻烦） */
+  .drawer-panel { width: 88vw; }
 }
 </style>

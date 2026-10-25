@@ -122,7 +122,7 @@ async function submit() {
   display: flex; align-items: center; justify-content: space-between;
   margin-top: 10px;
 }
-.gb-count { font-size: 9px; color: var(--ink-50); }
+.gb-count { font-size: 10px; color: var(--ink-50); }
 .gb-submit {
   font-size: 13px; font-weight: 600;
   color: var(--cream);
@@ -164,7 +164,7 @@ async function submit() {
 .gb-body { flex: 1; min-width: 0; }
 .gb-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .gb-name-label { font-size: 13px; font-weight: 700; color: var(--navy); }
-.gb-time { font-size: 8px; color: var(--ink-50); }
+.gb-time { font-size: 10px; color: var(--ink-50); }
 .gb-text-label { font-size: 13px; color: var(--ink-70); margin-top: 3px; word-break: break-word; }
 
 .gb-empty { color: var(--ink-50); font-size: 10px; text-align: center; padding: 20px 0; }

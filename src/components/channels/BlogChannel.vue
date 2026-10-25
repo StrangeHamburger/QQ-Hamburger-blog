@@ -32,7 +32,7 @@ import { blogs } from '../../data/content.js'
 
 <style scoped>
 .blog-note {
-  display: block; color: var(--tomato); font-size: 9px;
+  display: block; color: var(--tomato); font-size: 10px;
   padding-bottom: 6px; border-bottom: 1px solid var(--ink-08);
 }
 
@@ -69,7 +69,7 @@ import { blogs } from '../../data/content.js'
 .be-line {
   display: block;
   margin-top: 12px;
-  font-size: 8px;
+  font-size: 10px;
   color: var(--tomato);
   letter-spacing: 0.3em;
 }
@@ -80,14 +80,14 @@ import { blogs } from '../../data/content.js'
   transition: transform var(--dur-fast);
 }
 .blog-item:hover { transform: translateX(3px); }
-.blog-date { font-size: 9px; color: var(--ink-50); min-width: 52px; padding-top: 3px; }
+.blog-date { font-size: 10px; color: var(--ink-50); min-width: 52px; padding-top: 3px; }
 .blog-main { flex: 1; display: flex; flex-direction: column; }
 .blog-title { font-size: 14px; font-weight: 700; color: var(--ink); }
 .blog-excerpt { font-size: 12px; color: var(--ink-70); margin-top: 3px; line-height: 1.5; }
 .blog-tag {
-  font-size: 7px; color: var(--navy);
+  font-size: 10px; color: var(--navy);
   border: 1px solid var(--navy); border-radius: 3px;
   padding: 2px 6px; margin-top: 2px;
 }
-.blog-more { color: var(--ink-50); font-size: 9px; margin-top: 14px; }
+.blog-more { color: var(--ink-50); font-size: 10px; margin-top: 14px; }
 </style>

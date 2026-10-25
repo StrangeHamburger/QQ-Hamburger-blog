@@ -71,8 +71,8 @@ watch(() => props.activeLayer, (v) => { selected.value = v })
   display: flex;
   flex-direction: column;  /* 顶面包→底面包 */
   align-items: center;
-  justify-content: center;
-  padding-top: 30px;
+  justify-content: flex-end;   /* 层堆在底部：底面包坐在盘子上，而不是悬在半空 */
+  padding-bottom: 30px;
   animation: burger-float 4.5s ease-in-out infinite;  /* 轻微浮动 */
 }
 @keyframes burger-float {

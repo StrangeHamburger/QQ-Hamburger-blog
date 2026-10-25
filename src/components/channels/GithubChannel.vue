@@ -176,7 +176,7 @@ function closeRepo() { active.value = null }
 
 .gh-syncing {
   align-self: center;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--navy);
   animation: sync-pulse 1.2s ease-in-out infinite;
 }
@@ -204,8 +204,8 @@ function closeRepo() { active.value = null }
   color: var(--ink);
 }
 .gh-bio { font-size: 12px; color: var(--ink-70); max-width: 30ch; line-height: 1.6; }
-.gh-loc { font-size: 9px; color: var(--ink-50); }
-.gh-stats { font-size: 9px; color: var(--ink-50); }
+.gh-loc { font-size: 10px; color: var(--ink-50); }
+.gh-stats { font-size: 10px; color: var(--ink-50); }
 
 .gh-go {
   margin-top: 4px;
@@ -246,7 +246,7 @@ function closeRepo() { active.value = null }
   transition: color var(--dur-fast);
 }
 .gh-repo:hover .gh-name { color: var(--tomato); }
-.gh-side { font-size: 8px; color: var(--ink-50); display: flex; align-items: center; gap: 5px; }
+.gh-side { font-size: 10px; color: var(--ink-50); display: flex; align-items: center; gap: 5px; }
 .gh-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
 .gh-desc {
@@ -259,7 +259,7 @@ function closeRepo() { active.value = null }
 .gh-open {
   margin-top: 10px;
   align-self: flex-end;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--ink-40);
   transition: color var(--dur-fast);
 }

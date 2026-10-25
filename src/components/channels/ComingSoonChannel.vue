@@ -54,7 +54,7 @@ const assetsBase = import.meta.env.BASE_URL + 'assets/'
 .soon-line {
   display: block;
   margin-top: 14px;
-  font-size: 8px;
+  font-size: 10px;
   color: var(--tomato);
   letter-spacing: 0.3em;
 }

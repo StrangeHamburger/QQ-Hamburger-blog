@@ -215,11 +215,21 @@ import { computed } from 'vue'
 
 <style scoped>
 .mini-computer {
-  position: absolute;
-  right: 417px; top: 278px;
+  position: relative;   /* 放在 hero 右栏内随文档流（原为页面级 absolute 硬编码坐标） */
   z-index: 40;
   width: clamp(170px, 20vw, 225px);
   transition: transform var(--dur) var(--ease-spring);
+}
+/* 落地投影：椭圆软阴影垫在机身下，让收银机"放在台面上"而不是悬浮 */
+.mini-computer::before {
+  content: '';
+  position: absolute;
+  left: -10%; right: -10%; bottom: -18px;
+  height: 34px;
+  background: radial-gradient(ellipse at center, rgba(26, 26, 24, 0.16), transparent 68%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .box {
@@ -286,7 +296,7 @@ import { computed } from 'vue'
 .mc-boot {
   position: absolute;
   bottom: 4px; left: 6px;
-  font-size: 6px;
+  font-size: 8px;
   letter-spacing: 0.12em;
   color: rgba(255,255,255,0.4);
   font-family: var(--font-mono);
@@ -401,7 +411,7 @@ import { computed } from 'vue'
   transition: transform var(--dur-fast) var(--ease-spring), filter var(--dur-fast);
 }
 .btn-label {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--cream);
   letter-spacing: 0.18em;
@@ -420,10 +430,11 @@ import { computed } from 'vue'
 .btn-red:active, .btn-blue:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0,0,0,0.3); }
 .btn-red:disabled, .btn-blue:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ======== 凤凰（放大 + 可点击；absolute 随页面滚动） ======== */
+/* ======== 凤凰（放大 + 可点击；absolute 相对收银机） ========
+   落点在收银机右下：两栏 hero（右栏）与窄屏堆叠（容器左侧）都放得下，不会越出视口 */
 .fx-phenix {
   position: absolute;
-  left: 457px; top: 73px;   /* 相对收银台，左移 1/3 身位（170/3≈57px） */
+  left: 190px; bottom: -26px;
   width: 170px;
   z-index: 150;
   cursor: pointer;
@@ -438,10 +449,10 @@ import { computed } from 'vue'
 .fx-slide-leave-active { transition: transform 4500ms var(--ease-spring); }   /* 退场慢速（3500→4500） */
 .fx-slide-leave-to { transform: translateX(85vw); }
 
-/* ======== 气泡 v4（Q 版可爱风；absolute 随页面滚动） ======== */
+/* ======== 气泡 v4（Q 版可爱风；absolute 相对收银机） ======== */
 .fx-bubble {
   position: absolute;
-  left: 286px; top: 73px;   /* 相对收银台，左移 1/3 身位（180/3=60px） */
+  left: 205px; bottom: 168px;   /* 凤凰上方，尖尖朝下指凤凰 */
   width: 180px;
   background: #fffdf6;                 /* 奶油白 */
   border: 3px solid var(--ink);
@@ -466,19 +477,19 @@ import { computed } from 'vue'
   border: 2px solid var(--ink);
   border-radius: 50%;
 }
-/* 尖尖：talk 指向凤凰（右侧） */
+/* 尖尖：talk 指向下方的凤凰 */
 .fx-bubble::after {
   content: '';
   position: absolute;
-  left: 100%; top: 28px;
+  left: 30px; top: 100%;
   border: 9px solid transparent;
-  border-left-color: var(--ink);
+  border-top-color: var(--ink);
   border-radius: 2px;
 }
-/* hint 指向收银台（左侧；随页面移动；左移 1/3 身位） */
-.fx-bubble.hint { left: 279px; top: 33px; }
+/* hint 指向收银机屏幕（气泡在机身右侧，尖尖朝左） */
+.fx-bubble.hint { left: 240px; bottom: auto; top: 40px; }
 .fx-bubble.hint::after {
-  left: auto; right: 100%;
+  left: auto; right: 100%; top: 28px;
   border: 9px solid transparent;
   border-right-color: var(--ink);
 }

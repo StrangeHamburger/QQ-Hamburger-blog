@@ -162,7 +162,7 @@ onUnmounted(() => {
 }
 .pm-tag {
   display: inline-block;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--tomato);
   border: 1px solid var(--tomato);
   border-radius: 3px;

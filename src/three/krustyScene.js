@@ -441,7 +441,11 @@ export function createKrustyScene(el, opts = {}) {
     // 屏幕像素空间里 "上" 是世界 y 最大的角，因此传入顺序要换成
     // [TL, TR, BR, BL]，否则元素内容会上下颠倒。
     const px = [cornersWorld[3], cornersWorld[2], cornersWorld[1], cornersWorld[0]].map((v) => project(v))
-    portal.style.transform = quadTransform(w, h, px[0], px[1], px[2], px[3])
+    const m = quadTransform(w, h, px[0], px[1], px[2], px[3])
+    // 相机静止时矩阵不变：跳过相同写入。每帧重写会被 Chrome 当作"transform 动画中"，
+    // 整层用合成纹理采样而不按最终比例清晰光栅 → 投影画面/小字发糊
+    if (m === portal.style.transform) return
+    portal.style.transform = m
     portal.style.transformOrigin = '0 0'
   }
 
